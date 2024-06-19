@@ -32,11 +32,11 @@ module.exports = class User extends Model{
         tableName:'users',
         charset:'utf8mb4',
         collate:'utf8mb4_general_ci',
-      }
-    );
+      });
   }
 static associate(db){
-  db.User.hasMany(db.Review)
-  db.User.hasMany(db.Comment)
-}
+  db.User.hasMany(db.Review, {foreignKey:'user_index'});
+  db.User.hasMany(db.Comment, {foreignKey:'user_index'});
+  db.User.belongsToMany(db.Product, {through:'favorites' , foreignKey:'user_index'})
+  }
 }
