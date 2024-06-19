@@ -48,6 +48,8 @@ module.exports = class Review extends Model{
     });
   }
   static associate(db){
-    db.Review.hasMany(db.Comment);
+    db.Review.hasMany(db.Comment, {foreignKey:'rev_index'});
+    db.Review.belongsTo(db.User, {foreignKey:'user_index'});
+    db.Review.belongsTo(db.Product, {foreignKey:'prod_index'});
   }
 }

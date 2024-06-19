@@ -29,7 +29,7 @@ module.exports = class Comment extends Model{
     });
   }
   static associate(db){
-    db.Comments.belongsTo(db.User);
-    db.Comments.belongsTo(db.Review);
+    db.Comment.belongsTo(db.User,{foreignKey:'user_index'});
+    db.Comment.belongsTo(db.Review,{foreignKey:'rev_index'});
   }
 }

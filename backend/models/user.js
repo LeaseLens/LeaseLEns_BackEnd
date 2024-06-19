@@ -12,12 +12,16 @@ module.exports = class User extends Model{
           primaryKey:true,
         },
         user_ID:{
-          type: DataTypes.STRING,
+          type: DataTypes.STRING(10),
           allowNull:false,
           unique:true,
         },
         user_name:{
-          type:DataTypes.STRING,
+          type:DataTypes.STRING(10),
+          allowNull:false,
+        },
+        user_pw:{
+          type:DataTypes.STRING(255),
           allowNull:false,
         },
         user_points:{
