@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-mysql-session": "^3.0.2",
+    "express-session": "^1.18.0",
+    "mysql2": "^3.10.1",
+    "nodemon": "^3.1.0",
+    "sequelize": "^6.37.3"
+  },
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "PROJECT\r /models- 데이터베이스 모델 파일\r /routes- 라우팅\r /views- ejs template 파일\r /public- 정적 파일 (css,js, image 등)\r /controllers- 로직 처리\r /config - 설정 파일 (데이터베이스 연결 등)"
+}
