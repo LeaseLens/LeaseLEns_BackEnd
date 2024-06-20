@@ -1,7 +1,7 @@
 const {Op} = require('sequelize');
 const {comment, product, review, user} = require('../models');
 //제품 페이지 렌더링
-exports.main = async (req,res) => {
+exports.main = async (req,res, next) => {
   try{
     //category 쿼리 가져오기
     const category = req.query.category || 'all';
@@ -19,9 +19,8 @@ exports.main = async (req,res) => {
     //요청이 성공한 경우
   res.json(products);
   }catch(err){
-    //요청이 실패한 경우 에러처리
-    console.error(err);
-    res.status(500).send('서버 오류가 발생하였습니다.');
+    //요청이 실패한 경우 에러처리. 여기서 에러처리를 하지 말고, 에러처리 미들웨어에 전달해준다.
+    next(err);
   } 
 }
 
