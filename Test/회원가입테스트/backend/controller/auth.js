@@ -6,10 +6,10 @@ exports.register = async (req, res) => {
   const { user_name, user_ID, user_pw, confirmPassword } = req.body;
   console.log("Request body:", req.body); // 디버깅을 위해 추가
 
-  // if (!user_name || !user_ID || !user_pw || !confirmPassword) {
-  //   console.log(user_name, user_ID, user_pw, confirmPassword)
-  //   return res.status(400).json({ message: "All fields are required" });
-  // }
+  if (!user_name || !user_ID || !user_pw || !confirmPassword) {
+    console.log(user_name, user_ID, user_pw, confirmPassword)
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
   if (user_pw !== confirmPassword) {
     return res.status(400).json({ message: "Passwords do not match" });
