@@ -18,4 +18,6 @@
   },
   "include": ["src"],                                 // Include all files in the src directory.
   "exclude": ["node_modules", "build"]                // Exclude node_modules and build directories.
+
 }
+
