@@ -1,13 +1,17 @@
 const {Op} = require('sequelize');
-const {comment, product, review, user} = require('./models');
+const {comment, product, review, user} = require('../models');
 //제품 페이지 렌더링
 exports.main = async(req,res) => {
   try{
     //제품 목록
     const products = product.findAll();
-  }
-  //요청이 성공한 경우
+
+    //요청이 성공한 경우
   res.json(products);
+  }catch(err){
+
+  }
+  
 }
 
 //제품 상세 페이지
