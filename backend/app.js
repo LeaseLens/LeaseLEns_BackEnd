@@ -1,32 +1,39 @@
 const express = require('express');
-const path = require('path');
 const session = require('express-session');
-const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
-const db =require('./models');
-const PORT = 8080;
+const passport = require('passport');
+const bodyParser = require('body-parser');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const sequelize = require('./config/config').development; // Adjust this as necessary
 
-dotenv.config();
+require('./config/passportConfig')(passport);
+
 const app = express();
-db.sequelize
-  .sync()
-  .then(()=>{
-    console.log('db 연결 성공');
-  })
-  .catch(console.error);
-//cookie parser를 활용하여 쿠키 해석하기
 
-app.use('/', express.static(path.join(__dirname, 'uploads')));
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-app.use(cookieParser(process.env.COOKIE_SECRET));
-//express-session 미들웨어를 사용하여 세션 관리
+// Middleware
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
-  secret: 'mysecret', // 세션 암호화에 사용될 키
-  resave:false,
-  saveUninitialized:true
-}))
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: false,
+    store: new SequelizeStore({
+        db: sequelize
+    })
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.listen(PORT,()=>{
-  console.log(`${PORT}번 포트에서 서버 실행중 . . . `)
-})
+// Routes
+app.use('/auth', require('./routes/loginRouter'));
+
+// Example protected route
+app.get('/dashboard', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.send('Welcome to the dashboard');
+    } else {
+        res.redirect('/login');
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
