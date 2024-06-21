@@ -4,7 +4,7 @@ const product = require('./product');
 const review  = require('./review');
 const user = require('./user');
 
-const env = process.env.NODE_ENV || 'test';
+const env = process.env.NODE_ENV || 'yerim';
 const config = require('../config/config')[env];
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
 

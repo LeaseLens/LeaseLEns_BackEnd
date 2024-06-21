@@ -2,6 +2,7 @@ const express =require('express');
 const router = express.Router();
 const controller = require('../controller/userController');
 
+
 //회원가입
 router.post('/register', controller.register);
 
@@ -13,3 +14,6 @@ router.get('/logout',controller.logout);
 
 //회원탈퇴
 router.delete('/quit',controller.quit);
+
+
+module.exports=router;
