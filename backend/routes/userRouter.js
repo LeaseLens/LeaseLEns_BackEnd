@@ -1,51 +1,15 @@
-const express = require('express');
-const passport = require('passport');
-const { User } = require('../models'); // Ensure correct import path
-
+const express =require('express');
 const router = express.Router();
+const controller = require('../controller/userController');
 
-// User registration route
-router.post('/register', async (req, res) => {
-    try {
-        const { user_ID, user_pw, user_name } = req.body;
-        const hashedPassword = User.hashPassword(user_pw);
-        const newUser = await User.create({
-            user_ID,
-            user_pw: hashedPassword,
-            user_name
-        });
-        res.status(201).send('User registered successfully');
-    } catch (err) {
-        res.status(500).send('Error registering new user.');
-    }
-});
+//회원가입
+router.post('/register', controller.register);
 
-// User login route
-router.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            return res.status(400).send('Incorrect username or password.');
-        }
-        req.logIn(user, (err) => {
-            if (err) {
-                return next(err);
-            }
-            return res.send('Logged in successfully');
-        });
-    })(req, res, next);
-});
+//로그인
+router.post('/login',controller.login);
 
-// User logout route
-router.get('/logout', (req, res) => {
-    req.logout((err) => {
-        if (err) {
-            return res.status(500).send('Error logging out.');
-        }
-        res.send('Logged out successfully');
-    });
-});
+//로그아웃
+router.get('/logout',controller.logout);
 
-module.exports = router;
+//회원탈퇴
+router.delete('/quit',controller.quit);
