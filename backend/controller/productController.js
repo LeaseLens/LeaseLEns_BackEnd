@@ -1,5 +1,5 @@
 const {Op} = require('sequelize');
-const {comment, product, review, user} = require('../models');
+const {Comment, Product, Review, User} = require('../models');
 //제품 페이지 렌더링
 exports.main = async (req,res, next) => {
   try{
@@ -10,7 +10,7 @@ exports.main = async (req,res, next) => {
     const condition = category === 'all' ? {} : {prod_category : category};
 
     //제품 목록 가져오기
-    const products = product.findAll({
+    const products = await Product.findAll({
       where : condition,
       attributes: ['prod_index', 'prod_img', 'prod_name', 'prod_likes', 'prod_price'] // 필요한 필드 목록
     
