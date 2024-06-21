@@ -44,6 +44,6 @@ db.sequelize
       console.log(`${PORT}번 포트에서 서버 실행중 . . . `);
     });
   }).catch(err=>{
-    console.error('DB 연결 실패', err);
+    console.error('db 연결 실패', err);
   });
 
