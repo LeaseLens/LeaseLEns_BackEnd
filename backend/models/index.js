@@ -4,13 +4,9 @@ const product = require('./product');
 const review  = require('./review');
 const user = require('./user');
 
-const env = process.env.NODE_ENV || 'yerim';
+const env = process.env.NODE_ENV || 'test';
 const config = require('../config/config')[env];
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 
 const db = {};
 
@@ -29,10 +25,6 @@ Object.keys(db).forEach(modelName =>{
   }
 });
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
