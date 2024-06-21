@@ -2,9 +2,12 @@ const express = require('express');
 const session = require('express-session');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const passport= require('passport')
 const db =require('./models');
 const error404 = require('./Middlewares/error404');
 const handleError = require('./Middlewares/handleError');
+const passportConfig=require('./passport');
+
 
 const {userRouter, productRouter,renderRouter,reviewRouter}= require('./routes');
 
@@ -13,10 +16,15 @@ const PORT = 8080;
 dotenv.config();
 const app = express();
 
+passportConfig(); //passport config 초기화
+
 //cookie parser를 활용하여 쿠키 해석하기
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/users', userRouter);
 app.use('/reviews',reviewRouter);
