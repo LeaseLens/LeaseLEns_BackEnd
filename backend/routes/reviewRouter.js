@@ -16,7 +16,7 @@ router.delete('/:rev_idx', controller.deleteReview);
 router.get('/:rev_idx',controller.reviewDetails);
 
 //리뷰 댓글 작성하기
-router.post('/:rev_idx/comments/:com_idx', controller.writeComments);
+router.post('/:rev_idx/comments', controller.writeComments);
 
 //리뷰 댓글 수정하기
 router.patch('/:rev_idx/comments/:com_idx', controller.updateComments);
