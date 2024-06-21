@@ -1,5 +1,5 @@
-const { DataTypes, Model } = require('sequelize');
-const bcrypt = require('bcryptjs');
+const DataTypes  = require('sequelize');
+const {Model} =DataTypes;
 
 module.exports = class User extends Model {
     static init(sequelize) {
@@ -35,14 +35,6 @@ module.exports = class User extends Model {
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });
-    }
-
-    static hashPassword(password) {
-        return bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-    }
-
-    validatePassword(password) {
-        return bcrypt.compareSync(password, this.user_pw);
     }
 
     static associate(db) {
