@@ -13,7 +13,6 @@ exports.main = async (req,res, next) => {
     const products = await Product.findAll({
       where : condition,
       attributes: ['prod_index', 'prod_img', 'prod_name', 'prod_likes', 'prod_price'] // 필요한 필드 목록
-    
     });
 
     //요청이 성공한 경우
@@ -77,6 +76,41 @@ exports.details = async (req,res, next) =>{
 }
 
 //제품 찜하기
-exports.like = (req,res)=>{
-  res.send('like');
-}
+exports.like = async(req,res,next)=>{
+  try{
+    const productId = req.params.prod_idx;
+    const userId = req.session.userId; //세션에 저장된 사용자 ID를 가져올 것.
+
+    //product의
+    const product = await Product.findByPk(productId);
+    if (!product) {
+      return res.status(404).json({
+        code: 404,
+        message: '제품을 찾을 수 없습니다.',
+        error: {}
+      });
+    }
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        code: 404,
+        message: '사용자를 찾을 수 없습니다.',
+        error: {}
+      });
+    }
+
+     // Sequelize의 add 메서드를 통해 연결
+    await user.addProduct(product);
+
+     // 성공적으로 연결되었음을 확인할 수 있음
+    res.json({
+      code: 200,
+      message: '제품을 찜했습니다.',
+      data: {
+        product: product // product 정보 반환
+      }
+    });
+  }catch(err){
+    next(err);
+  }
+};
