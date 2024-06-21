@@ -1,4 +1,4 @@
-const {Product,Review} = require('../models');
+const {Product,Review, User} = require('../models');
 
 //제품 페이지 조회 및 검색
 exports.main = async (req,res, next) => {

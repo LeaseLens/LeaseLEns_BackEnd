@@ -9,9 +9,6 @@ router.get('/',controller.main);
 //review 작성하기(제출)
 router.post('/',controller.writeReview);
 
-//review 검색하기
-router.get('/',controller.searchReview);
-
 //review 글 삭제하기
 router.delete('/:rev_idx', controller.deleteReview);
 
