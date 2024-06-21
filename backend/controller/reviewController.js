@@ -1,4 +1,4 @@
-const {Review, User, Product} = require('../models');
+const {Review, User, Product, Comment} = require('../models');
 
 //reviews 게시판 페이지. 리뷰 조회, 리뷰 검색 등의 기능을 수행한다.
 exports.main = async (req,res,next) => {
@@ -84,12 +84,48 @@ exports.writeReview = async(req,res,next) =>{
   }catch(err){
     next(err);
   }
-
 }
 
 //review 글 삭제하기
-exports.deleteReview = (req,res) =>{
-  res.send('delete');
+exports.deleteReview = async(req, res, next) =>{
+  try{
+    //req.params를 통해 어떤 rev_index인지 받아온다.
+    //reviews 테이블 삭제(req에서 받아온 rev_index 사용)
+
+    const rev_index = req.params.rev_index;
+
+    //해당 리뷰가 있는지 확인한다.
+    const review = await Review.findByPk(rev_index);
+    if(!review){
+      return res.status(404).json({
+        code:404,
+        message:'리뷰를 찾을 수 없습니다.',
+        data : {}
+      })
+    }
+
+    //comments 테이블의 rev_index 값이 현재 rev_index값과 같은 행 모두 삭제
+    await Comment.destroy({
+      where: {
+        rev_index: rev_index
+      }
+    });
+
+    // reviews 테이블에서 해당 리뷰 삭제
+    await Review.destroy({
+      where: {
+        rev_index: rev_index
+      }
+    });
+    // 요청이 성공한 경우
+    res.json({
+      code: 200,
+      message: '리뷰가 성공적으로 삭제되었습니다.',
+      data: {}
+    });
+  }catch(err){
+    next(err);
+  }
 }
 
 //리뷰 상세 페이지
