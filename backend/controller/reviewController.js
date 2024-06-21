@@ -134,8 +134,50 @@ exports.reviewDetails = (req,res) =>{
 }
 
 //리뷰 댓글 작성하기
-exports.writeComments = (req,res)=>{
-  res.send('writeComments');
+exports.writeComments = async(req,res,next)=>{
+  try {
+    //comments 테이블에 req.body로 넘어온 데이터를 삽입한다.
+    //user id는 session에서 받아온다.
+    const user_index = req.session.userId;
+    if(!user_index){
+      res.status(401).json({
+        code:401,
+        message : '로그인이 필요합니다.',
+        data : {},
+      });
+    }
+    //review index는 req.params에 적혀있다.
+    const rev_index = req.params.rev_idx;
+
+    const {com_text} = req.body;
+
+    // 필수 데이터 확인
+    if (!com_text) {
+      return res.status(400).json({
+        code: 400,
+        message: '댓글 내용을 입력해 주세요.',
+        data: {}
+      });
+    }
+
+    // 새로운 댓글 생성
+    const newComment = await Comment.create({
+      rev_index,
+      user_index,
+      com_text,
+      com_createdAt: new Date() // 현재 날짜 시간
+    });
+    //요청 성공
+    res.json({
+      code:200,
+      message:'댓글이 성공적으로 작성되었습니다.',
+      data:{
+        comment : newComment
+      }
+    })
+  } catch (err) {
+    next(err);
+  }
 }
 
 //리뷰 댓글 수정하기
