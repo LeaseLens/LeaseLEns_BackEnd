@@ -77,7 +77,9 @@ exports.writeReview = async(req,res,next) =>{
     res.json({
       code: 200,
       message: '리뷰가 성공적으로 작성되었습니다.',
-      data: {}
+      data: {
+        review : newReview
+      }
     });
   }catch(err){
     next(err);
