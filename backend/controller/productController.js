@@ -81,7 +81,6 @@ exports.like = async(req,res,next)=>{
     const productId = req.params.prod_idx;
     const userId = req.session.userId; //세션에 저장된 사용자 ID를 가져올 것.
 
-    //product의
     const product = await Product.findByPk(productId);
     if (!product) {
       return res.status(404).json({
@@ -99,7 +98,7 @@ exports.like = async(req,res,next)=>{
       });
     }
 
-     // Sequelize의 add 메서드를 통해 연결
+     // Sequelize의 add 메서드를 통해 연결. favorites 중간 테이블에 추가할 예정.
     await user.addProduct(product);
 
      // 성공적으로 연결되었음을 확인할 수 있음
