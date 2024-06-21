@@ -4,6 +4,8 @@ const session = require('express-session');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const db =require('./models');
+const error404 = require('./Middlewares/error404');
+const handleError = require('./Middlewares/handleError');
 
 const {userRouter, productRouter,renderRouter,reviewRouter}= require('./routes');
 
@@ -35,22 +37,10 @@ app.use(session({
 }))
 
 //404 에러처리 미들웨어
-app.use((req, res, next) => {
-  const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
-  error.status = 404;
-  next(error); // 다음 미들웨어로 에러를 전달합니다.
-});
+app.use(error404);
 
 //기타 에러처리 미들웨어
-app.use((err, req, res, next) => {
-  console.error(err.stack); // 에러 스택을 콘솔에 출력합니다.
-
-  res.status(err.status || 500)
-  .send({
-    message: err.message,
-    error: process.env.NODE_ENV === 'development' ? err : {} // 개발 환경에서는 상세한 에러 정보를 전달합니다.
-  });
-});
+app.use(handleError);
 
 
 app.listen(PORT,()=>{

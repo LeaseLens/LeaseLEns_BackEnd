@@ -1,4 +1,3 @@
-
 const handleError = (err, req, res, next) => {
   console.error(err.stack); // 에러 스택을 콘솔에 출력합니다.
 
