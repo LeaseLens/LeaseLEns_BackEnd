@@ -43,8 +43,48 @@ exports.main = async (req,res,next) => {
 }
 
 //review 작성하기(제출)
-exports.writeReview = (req,res) =>{
-  res.send('write');
+exports.writeReview = async(req,res,next) =>{
+  try{ 
+  //review table에 입력 데이터가 추가된다.
+  // 입력받을 데이터는 review table의 rev_title, user_index, prod_index, rev_isAuth(default로 false값), 
+  //rev_text, rev_createdAt(default로 현재 dateTime), rev_img(있을수도 없을수도 있음), rev_authImg(필수), rev_rating
+
+  const {rev_title, user_index, prod_index, rev_text, rev_img, rev_authImg, rev_rating} = req.body;
+
+    // 필수 데이터 검사
+    if (!rev_title || !user_index || !prod_index || !rev_text || !rev_authImg || !rev_rating) {
+      return res.status(400).json({
+        code: 400,
+        message: '필수 필드를 모두 입력해 주세요.',
+        data: {}
+      });
+    }
+
+    // 새로운 리뷰 생성
+    const newReview = await Review.create({
+      rev_title,
+      user_index,
+      prod_index,
+      rev_isAuth: false, // 기본값
+      rev_text,
+      rev_createdAt: new Date(), // 현재 날짜 시간
+      rev_img: rev_img || null, // 선택적 필드
+      rev_authImg,
+      rev_rating
+    });
+
+  //res 데이터 : 성공한 상태코드, 메시지. 데이터는 빈 객체를 보낼 것.
+    res.json({
+      code: 200,
+      message: '리뷰가 성공적으로 작성되었습니다.',
+      data: {
+        review : newReview
+      }
+    });
+  }catch(err){
+    next(err);
+  }
+
 }
 
 //review 글 삭제하기
