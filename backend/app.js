@@ -22,10 +22,6 @@ const app = express();
 
 passportConfig(); //passport config 초기화
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(express.static(path.join(__dirname, 'public')));
-
 //cookie parser를 활용하여 쿠키 해석하기
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -35,8 +31,8 @@ app.use(cookieParser());
 app.use(session({
   secret:process.env.COOKIE_SECRET,
   resave:false,
-  cookie:{ secure:false },          //HTTPS 사용할 때 값을 true로 바꿀것
-  saveUninitialized:true,
+  cookie:{ secure:false },          //HTTPS 사용할 때 값을 true로 바꿔주기
+  saveUninitialized:true,           //MySQL database 연결할 때 database 이름 바꿔주기
     store: new MySQLStore({
       host: config.yerim.host,
       user: config.yerim.username,
@@ -53,9 +49,6 @@ app.use('/reviews',reviewRouter);
 app.use('/products', productRouter);
 app.use('/', renderRouter);
 
-
-
-
 //404 에러처리 미들웨어
 app.use(error404);
 
@@ -71,7 +64,4 @@ db.sequelize
     });
   }).catch(err=>{
     console.error('db 연결 실패', err);
-  });
-  app.listen(3065, () => {
-    console.log('서버 실행 중!');
   });
