@@ -79,7 +79,7 @@ exports.details = async (req,res, next) =>{
 exports.like = async(req,res,next)=>{
   try{
     const productId = req.params.prod_idx;
-    const userId = req.session.userId; //세션에 저장된 사용자 ID를 가져올 것.
+    const userId = req.session.user_Id; //세션에 저장된 사용자 ID를 가져올 것.
 
     const product = await Product.findByPk(productId);
     if (!product) {

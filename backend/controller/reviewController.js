@@ -12,7 +12,7 @@ aws.config.update({
   accessKeyId: process.env.AWS_S3_KEY_ID,
   secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
   region: process.env.AWS_S3_REGION,
-})
+});
 
 const s3 = new aws.S3();
 
@@ -20,7 +20,7 @@ const s3 = new aws.S3();
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: process.env.AWS_S3_BUCKET_NAME,
+    bucket: process.env.AWS_S3_BUCKET,
     acl: 'public-read', // 파일 접근 권한 설정(공개)
     key: function(req, file, cb) {
       cb(null, 'reviews/' + Date.now() + '-' + file.originalname); // 파일 이름 설정
@@ -71,50 +71,61 @@ exports.main = async (req,res,next) => {
 }
 
 //review 작성하기(제출)
-exports.writeReview = async(req,res,next) =>{
-  try{ 
-  //review table에 입력 데이터가 추가된다.
-  // 입력받을 데이터는 review table의 rev_title, user_index, prod_index, rev_isAuth(default로 false값), 
-  //rev_text, rev_createdAt(default로 현재 dateTime), rev_img(있을수도 없을수도 있음), rev_authImg(필수), rev_rating
-
-  const {rev_title, user_index, prod_index, rev_text, rev_img, rev_authImg, rev_rating} = req.body;
-
-    // 필수 데이터 검사
-    if (!rev_title || !user_index || !prod_index || !rev_text || !rev_authImg || !rev_rating) {
-      return res.status(400).json({
-        code: 400,
-        message: '필수 필드를 모두 입력해 주세요.',
-        data: {}
-      });
+// 리뷰 작성하기(제출)
+exports.writeReview = (req, res, next) => {
+  // 이미지 업로드 처리
+  upload.fields([{ name: 'rev_img', maxCount: 3 }, { name: 'rev_authImg', maxCount: 3 }])(req, res, async function(err) {
+    if (err) {
+      console.error('Error uploading images:', err);
+      return next(err);
     }
-    //이미지 업로드 처리
-    upload.single()
 
-    // 새로운 리뷰 생성
-    const newReview = await Review.create({
-      rev_title,
-      user_index,
-      prod_index,
-      rev_isAuth: false, // 기본값
-      rev_text,
-      rev_createdAt: new Date(), // 현재 날짜 시간
-      rev_img: rev_img || null, // 선택적 필드
-      rev_authImg,
-      rev_rating
-    });
+    try {
+      const { rev_title, user_index, prod_index, rev_text, rev_rating } = req.body;
 
-  //res 데이터 : 성공한 상태코드, 메시지. 데이터는 빈 객체를 보낼 것.
-    res.json({
-      code: 200,
-      message: '리뷰가 성공적으로 작성되었습니다.',
-      data: {
-        review : newReview
+      // 필수 데이터 검사
+      if (!rev_title || !user_index || !prod_index || !rev_text || !rev_rating) {
+        return res.status(400).json({
+          code: 400,
+          message: '필수 필드를 모두 입력해 주세요.',
+          data: {}
+        });
       }
-    });
-  }catch(err){
-    next(err);
-  }
-}
+
+      // 업로드된 이미지의 URL 가져오기
+      const rev_img_urls = req.files['rev_img'] ? req.files['rev_img'].map(file => file.location) : [];
+      const rev_authImg_urls = req.files['rev_authImg'] ? req.files['rev_authImg'].map(file => file.location) : [];
+
+      // 쉼표로 구분된 문자열로 결합.
+      const rev_img = rev_img_urls.join(',');
+      const rev_authImg = rev_authImg_urls.join(',');
+
+      // 새로운 리뷰 생성
+      const newReview = await Review.create({
+        rev_title,
+        user_index,
+        prod_index,
+        rev_isAuth: false, // 기본값
+        rev_text,
+        rev_createdAt: new Date(), // 현재 날짜 시간
+        rev_img, // 선택적 필드
+        rev_authImg, // 필수 필드
+        rev_rating
+      });
+
+      // 요청 성공
+      res.json({
+        code: 200,
+        message: '리뷰가 성공적으로 작성되었습니다.',
+        data: {
+          review: newReview
+        }
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+};
 
 //review 글 삭제하기
 exports.deleteReview = async(req, res, next) =>{
@@ -168,7 +179,7 @@ exports.writeComments = async(req,res,next)=>{
   try {
     //comments 테이블에 req.body로 넘어온 데이터를 삽입한다.
     //user id는 session에서 받아온다.
-    const user_index = req.session.userId;
+    const user_index = req.session.user_Id;
     if(!user_index){
       res.status(401).json({
         code:401,

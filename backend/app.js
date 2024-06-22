@@ -11,7 +11,6 @@ const db =require('./models');
 const error404 = require('./Middlewares/error404');
 const handleError = require('./Middlewares/handleError');
 const passportConfig=require('./passport');
-const config = require('./config/config');
 const path= require('path')
 const MySQLStore = require('express-mysql-session')(session)
 
@@ -21,6 +20,11 @@ const {userRouter, productRouter,renderRouter,reviewRouter}= require('./routes')
 const PORT = 8080;
 
 dotenv.config();
+
+
+const env = process.env.NODE_ENV || 'development' || 'yerim';
+const config = require('./config/config')[env];
+
 const app = express();
 passportConfig(); //passport config 초기화
 
@@ -45,10 +49,10 @@ app.use(session({
   cookie:{ secure:false },          //HTTPS 사용할 때 값을 true로 바꿔주기
   saveUninitialized:true,           //MySQL database 연결할 때 database 이름 바꿔주기
     store: new MySQLStore({
-      host: config.yerim.host,
-      user: config.yerim.username,
-      password: config.yerim.password,
-      database: config.yerim.database
+      host: config.host,
+      user: config.username,
+      password: config.password,
+      database: config.database
     }),
 }),
 );
