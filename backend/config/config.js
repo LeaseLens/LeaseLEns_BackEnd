@@ -23,5 +23,15 @@ module.exports = {
     database:'lease_lens',
     host:'127.0.0.1',
     dialect:'mysql',
+  },
+  yerim:{
+    username:'root',
+    password:'1234',
+    database:'kdt',
+    host:'localhost',
+    dialect:'mysql'
   }
+  
 }
+
+
