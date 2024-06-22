@@ -3,11 +3,14 @@ const session = require('express-session');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const passport= require('passport')
+const multer = require('multer');
+const aws = require('aws-sdk');
+const multerS3 = require('multer-s3');
+
 const db =require('./models');
 const error404 = require('./Middlewares/error404');
 const handleError = require('./Middlewares/handleError');
 const passportConfig=require('./passport');
-const config = require('./config/config');
 const path= require('path')
 const MySQLStore = require('express-mysql-session')(session)
 
@@ -17,10 +20,22 @@ const {userRouter, productRouter,renderRouter,reviewRouter}= require('./routes')
 const PORT = 8080;
 
 dotenv.config();
-require('dotenv').config();
-const app = express();
 
+
+const env = process.env.NODE_ENV || 'development' || 'yerim';
+const config = require('./config/config')[env];
+
+const app = express();
 passportConfig(); //passport config 초기화
+
+aws.config.update({
+  accessKeyId: process.env.AWS_S3_KEY_ID,
+  secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
+  region: process.env.AWS_S3_REGION,
+});
+
+//aws S3 인스턴스 생성
+const s3 = new aws.S3();
 
 //cookie parser를 활용하여 쿠키 해석하기
 app.use(express.json());
@@ -34,17 +49,17 @@ app.use(session({
   cookie:{ secure:false },          //HTTPS 사용할 때 값을 true로 바꿔주기
   saveUninitialized:true,           //MySQL database 연결할 때 database 이름 바꿔주기
     store: new MySQLStore({
-      host: config.yerim.host,
-      user: config.yerim.username,
-      password: config.yerim.password,
-      database: config.yerim.database
+      host: config.host,
+      user: config.username,
+      password: config.password,
+      database: config.database
     }),
 }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/users', userRouter); 
+app.use('/users', userRouter);
 app.use('/reviews',reviewRouter);
 app.use('/products', productRouter);
 app.use('/', renderRouter);
