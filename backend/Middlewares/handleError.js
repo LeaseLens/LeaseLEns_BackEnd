@@ -1,4 +1,4 @@
-const handleError = (err, req, res, next) => {
+const handleError = (err, req, res) => {
   console.error(err.stack); // 에러 스택을 콘솔에 출력합니다.
 
   // 기본적으로 사용할 에러 포맷

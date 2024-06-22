@@ -1,4 +1,32 @@
 const {Review, User, Product, Comment} = require('../models');
+const aws = require('aws-sdk');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const dotenv = require('dotenv');
+
+//이미지 업로드 구현을 위한 설정 불러오기
+dotenv.config();
+
+//AWS 루트 계정 로그인.
+aws.config.update({
+  accessKeyId: process.env.AWS_S3_KEY_ID,
+  secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
+  region: process.env.AWS_S3_REGION,
+})
+
+const s3 = new aws.S3();
+
+//이미지 업로드 multer 설정하기
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.AWS_S3_BUCKET_NAME,
+    acl: 'public-read', // 파일 접근 권한 설정(공개)
+    key: function(req, file, cb) {
+      cb(null, 'reviews/' + Date.now() + '-' + file.originalname); // 파일 이름 설정
+    }
+  })
+})
 
 //reviews 게시판 페이지. 리뷰 조회, 리뷰 검색 등의 기능을 수행한다.
 exports.main = async (req,res,next) => {
@@ -59,6 +87,8 @@ exports.writeReview = async(req,res,next) =>{
         data: {}
       });
     }
+    //이미지 업로드 처리
+    upload.single()
 
     // 새로운 리뷰 생성
     const newReview = await Review.create({
