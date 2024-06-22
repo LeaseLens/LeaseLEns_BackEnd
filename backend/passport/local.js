@@ -1,21 +1,28 @@
 const passport = require('passport');
-const local = require('./local');
+const { Strategy: LocalStrategy } = require('passport-local');
 const { User } = require('../models');
+const bcrypt = require('bcrypt');
 
 module.exports = () => {
-  passport.serializeUser((user, done) => {
-    done(null, user.id); // 사용자의 id를 세션에 저장
-  });
-
-  passport.deserializeUser(async (id, done) => {
+  passport.use(new LocalStrategy({
+    usernameField: 'user_ID',
+    passwordField: 'user_pw',
+  }, async (user_ID, user_pw, done) => {
     try {
-      const user = await User.findOne({ where: { id }}); // 세션에 저장된 id를 이용해 사용자 정보 조회
-      done(null, user); // 조회된 사용자 정보를 req.user에 저장
+      const user = await User.findOne({
+        where: { user_ID }
+      });
+      if (!user) {
+        return done(null, false, { reason: '존재하지 않는 사용자입니다만!' }); //output: {}.    message 출력이 안되므로 수정 필요
+      }
+      const result = await bcrypt.compare(user_pw, user.user_pw);
+      if (result) {
+        return done(null, user);
+      }
+      return done(null, false, { reason: '비밀번호가 틀렸습니다.' }); //output: {}.    message 출력이 안되므로 수정 필요
     } catch (error) {
       console.error(error);
-      done(error);
+      return done(error);
     }
-  });
-
-  local(); // 로컬 전략 초기화
+  }));
 };

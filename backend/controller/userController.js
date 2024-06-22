@@ -30,15 +30,16 @@ exports.register = async (req, res) => {
 };
 
 //로그인
-exports.login = (req, res) => {
+exports.login = (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
-      return handleError(err, req, res);
+     next(err)
     }
     if (!user) {
       return res.status(401).json({ message: info.message });
     }
-    return res.login(user, (loginErr) => {
+    return req.login(user, (loginErr) => {
+      console.log('req.login user', user)
       if (loginErr) {
         return handleError(loginErr, req, res);
       }
@@ -49,6 +50,7 @@ exports.login = (req, res) => {
 
 //로그아웃
 exports.logout = (req, res) => {
+
   req.logout((err) => {
     if (err) {
       return res
@@ -60,6 +62,7 @@ exports.logout = (req, res) => {
   });
 };
 
+//회원탈퇴
 exports.quit = async (req, res) => {
   try {
     const userId = req.user.user_index;

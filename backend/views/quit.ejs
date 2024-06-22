@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIT</title>
+</head>
+<body>
+    <p>Are you sure you want to quit?</p>
+    <form action="/users/quit" method="delete">
+      <button type="submit" onclick="quitUser()">Quit</button>
+    </form>
+    <script>
+      function quitUser() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/users/quit', true);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            alert('회원탈퇴 성공');
+            window.location.href = '/';
+          }
+        };
+        xhr.send();
+      }
+    </script>
+</body>
+</html>
