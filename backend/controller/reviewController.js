@@ -133,8 +133,10 @@ exports.deleteReview = async(req, res, next) =>{
   try{
     //req.params를 통해 어떤 rev_index인지 받아온다.
     //reviews 테이블 삭제(req에서 받아온 rev_index 사용)
-
+    const user_index = req.session.user_Id;
     const rev_index = req.params.rev_idx;
+
+    //해당 리뷰를 작성한 사람이 현재 로그인된 사람인지 확인한다.
 
     //해당 리뷰가 있는지 확인한다.
     const review = await Review.findByPk(rev_index);
@@ -145,7 +147,14 @@ exports.deleteReview = async(req, res, next) =>{
         data : {}
       })
     }
-
+  //해당 리뷰를 작성한 사람이 현재 로그인된 사람인지 확인한다.
+    if (review.user_index !== user_index) {
+      return res.status(403).json({
+        code: 403,
+        message: '리뷰를 삭제할 권한이 없습니다.',
+        data: {}
+      });
+    }
 
     // AWS S3에서 리뷰 이미지 삭제
     if (review.rev_img) {
@@ -292,6 +301,7 @@ exports.writeComments = async(req,res,next)=>{
 //리뷰 댓글 수정하기
 exports.updateComments = async (req,res,next)=>{
   try{
+    const user_index = req.session.user_Id; //로그인된 사용자가 작성한 댓글이 맞는지 확인해줄 것.
     const rev_index = req.params.rev_idx;
     const com_index = req.params.com_idx;
     const { com_text } = req.body;  
@@ -309,7 +319,8 @@ exports.updateComments = async (req,res,next)=>{
     const updatedComment = await Comment.findOne({
       where: {
         com_index,
-        rev_index
+        rev_index,
+        user_index
       }
     });    
 
@@ -341,6 +352,54 @@ exports.updateComments = async (req,res,next)=>{
 }
 
 //리뷰 댓글 삭제하기
-exports.deleteComments = (req,res)=>{
-  res.send('dleteComments');
+exports.deleteComments = async(req,res,next)=>{
+  try{
+    const user_index = req.session.user_Id;
+    const com_index = req.params.com_idx;
+    const rev_index = req.params.rev_idx;  
+
+        // 댓글을 찾습니다.
+    const comment = await Comment.findOne({
+      where: {
+        com_index,
+        rev_index
+      }
+    });
+
+    // 해당 댓글이 존재하지 않는 경우
+    if (!comment) {
+      return res.status(404).json({
+        code: 404,
+        message: '댓글을 찾을 수 없습니다.',
+        data: {}
+      });
+    }    
+
+    // 댓글 작성자가 현재 로그인된 사용자와 일치하는지 확인합니다.
+    if (comment.user_index !== user_index) {
+      return res.status(403).json({
+        code: 403,
+        message: '댓글을 삭제할 권한이 없습니다.',
+        data: {}
+      });
+    }
+
+    // 댓글을 삭제합니다.
+    await Comment.destroy({
+      where: {
+        com_index,
+        rev_index,
+        user_index
+      }
+    });
+
+    // 요청이 성공한 경우
+    res.json({
+      code: 200,
+      message: '댓글이 성공적으로 삭제되었습니다.',
+      data: {}
+    });
+  }catch(err){
+    next(err);
+  }
 }
