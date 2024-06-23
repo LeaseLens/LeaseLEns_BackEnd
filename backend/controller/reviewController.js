@@ -53,7 +53,6 @@ exports.main = async (req,res,next) => {
         {
           model: Product,
           attributes: ['prod_name'],
-          required: true // prod_index에 해당하는 product가 없는 경우 제외
         }
       ]
     })
@@ -79,8 +78,7 @@ exports.writeReview = (req, res, next) => {
   // 이미지 업로드 처리
   upload.fields([{ name: 'rev_img', maxCount: 3 }, { name: 'rev_authImg', maxCount: 3 }])(req, res, async function(err) {
     if (err) {
-      console.error('Error uploading images:', err);
-      return next(err);
+      next(err);
     }
 
     try {
@@ -136,7 +134,7 @@ exports.deleteReview = async(req, res, next) =>{
     //req.params를 통해 어떤 rev_index인지 받아온다.
     //reviews 테이블 삭제(req에서 받아온 rev_index 사용)
 
-    const rev_index = req.params.rev_index;
+    const rev_index = req.params.rev_idx;
 
     //해당 리뷰가 있는지 확인한다.
     const review = await Review.findByPk(rev_index);
@@ -197,8 +195,56 @@ exports.deleteReview = async(req, res, next) =>{
 }
 
 //리뷰 상세 페이지
-exports.reviewDetails = (req,res) =>{
-  res.send('details');
+exports.reviewDetails = async (req,res,next) =>{
+  try{
+    //파라미터로 리뷰의 인덱스를 받는다.
+    const rev_index = req.params.rev_idx;
+    //rev_index에 해당하는 리뷰의 rev_isAuth, rev_text,rev_img,rev_title,rev_rating 조회
+    //rev_index의 테이블에 attribute로 있는 prod_idx에 해당하는 product 테이블의 prod_name 조회
+    //comment 테이블에 rev_idx가 현재 rev_index와 같은 모든 행의 com_text, com_date, user_index에 해당하는 user 테이블의 user_ID 조회.
+    const review = await Review.findOne({
+      where: { rev_index },
+      attributes: ['rev_isAuth', 'rev_text', 'rev_img', 'rev_title', 'rev_rating'],
+      include: [
+        {
+          model: Product,
+          attributes: ['prod_name'],
+          required: true
+        },
+        {
+          model: Comment,
+          attributes: ['com_text', 'com_createdAt'],
+          include: [
+            {
+              model: User,
+              attributes: ['user_ID'],
+              required: true
+            }
+          ]
+        }
+      ]
+    });
+    // 해당 리뷰가 없을 경우
+    if (!review) {
+      return res.status(404).json({
+        code: 404,
+        message: '리뷰를 찾을 수 없습니다.',
+        data: {}
+      });
+    }    
+
+    // 요청 성공
+    res.json({
+      code: 200,
+      message: '리뷰 상세 정보를 성공적으로 가져왔습니다.',
+      data: {
+        review
+      }
+    });    
+    
+  }catch(err){
+    next(err);
+  }
 }
 
 //리뷰 댓글 작성하기

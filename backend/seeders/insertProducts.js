@@ -182,7 +182,5 @@ const db = require('../models'); // models 폴더에서 db 객체를 가져옵�
     console.log('Products have been inserted successfully.');
   } catch (error) {
     next(err);
-  } finally {
-    await db.sequelize.close();
   }
 })();
