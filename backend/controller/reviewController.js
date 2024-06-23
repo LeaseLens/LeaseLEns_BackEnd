@@ -202,6 +202,7 @@ exports.reviewDetails = async (req,res,next) =>{
     //rev_index에 해당하는 리뷰의 rev_isAuth, rev_text,rev_img,rev_title,rev_rating 조회
     //rev_index의 테이블에 attribute로 있는 prod_idx에 해당하는 product 테이블의 prod_name 조회
     //comment 테이블에 rev_idx가 현재 rev_index와 같은 모든 행의 com_text, com_date, user_index에 해당하는 user 테이블의 user_ID 조회.
+    console.log("review = await 진입");
     const review = await Review.findOne({
       where: { rev_index },
       attributes: ['rev_isAuth', 'rev_text', 'rev_img', 'rev_title', 'rev_rating'],
@@ -289,8 +290,54 @@ exports.writeComments = async(req,res,next)=>{
 }
 
 //리뷰 댓글 수정하기
-exports.updateComments = (req,res)=>{
-  res.send('updateComments');
+exports.updateComments = async (req,res,next)=>{
+  try{
+    const rev_index = req.params.rev_idx;
+    const com_index = req.params.com_idx;
+    const { com_text } = req.body;  
+
+    // 필수 데이터 확인
+    if (!com_text) {
+      return res.status(400).json({
+        code: 400,
+        message: '댓글 내용을 입력해 주세요.',
+        data: {}
+      });
+    }
+
+    // 댓글 업데이트
+    const updatedComment = await Comment.findOne({
+      where: {
+        com_index,
+        rev_index
+      }
+    });    
+
+    // 해당하는 댓글이 없는 경우
+    if (!updatedComment) {
+      return res.status(404).json({
+        code: 404,
+        message: '해당하는 리뷰 댓글을 찾을 수 없습니다.',
+        data: {}
+      });
+    }    
+
+    // 댓글 내용 업데이트
+    updatedComment.com_text = com_text;
+    await updatedComment.save();    
+
+    // 요청 성공
+    res.json({
+      code: 200,
+      message: '댓글이 성공적으로 수정되었습니다.',
+      data: {
+        comment: updatedComment
+      }
+    });    
+
+  }catch(err){
+    next(err);
+  }
 }
 
 //리뷰 댓글 삭제하기
