@@ -73,6 +73,9 @@ exports.main = async (req,res,next) => {
 //review 작성하기(제출)
 // 리뷰 작성하기(제출)
 exports.writeReview = (req, res, next) => {
+
+  const user_index = req.session.user_Id;
+
   // 이미지 업로드 처리
   upload.fields([{ name: 'rev_img', maxCount: 3 }, { name: 'rev_authImg', maxCount: 3 }])(req, res, async function(err) {
     if (err) {
@@ -81,10 +84,10 @@ exports.writeReview = (req, res, next) => {
     }
 
     try {
-      const { rev_title, user_index, prod_index, rev_text, rev_rating } = req.body;
+      const { rev_title, prod_index, rev_text, rev_rating } = req.body;
 
       // 필수 데이터 검사
-      if (!rev_title || !user_index || !prod_index || !rev_text || !rev_rating) {
+      if (!rev_title || !prod_index || !rev_text || !rev_rating) {
         return res.status(400).json({
           code: 400,
           message: '필수 필드를 모두 입력해 주세요.',
@@ -145,6 +148,30 @@ exports.deleteReview = async(req, res, next) =>{
       })
     }
 
+
+    // AWS S3에서 리뷰 이미지 삭제
+    if (review.rev_img) {
+      const revImgUrls = review.rev_img.split(',');
+      for (const imgUrl of revImgUrls) {
+        const key = imgUrl.split('.com/')[1]; // S3의 객체 키 추출
+        await s3.deleteObject({
+          Bucket: process.env.AWS_S3_BUCKET,
+          Key: key
+        }).promise();
+      }
+    }
+
+    if (review.rev_authImg) {
+      const revAuthImgUrls = review.rev_authImg.split(',');
+      for (const authImgUrl of revAuthImgUrls) {
+        const key = authImgUrl.split('.com/')[1]; // S3의 객체 키 추출
+        await s3.deleteObject({
+          Bucket: process.env.AWS_S3_BUCKET,
+          Key: key
+        }).promise();
+      }
+    }
+
     //comments 테이블의 rev_index 값이 현재 rev_index값과 같은 행 모두 삭제
     await Comment.destroy({
       where: {
@@ -180,13 +207,7 @@ exports.writeComments = async(req,res,next)=>{
     //comments 테이블에 req.body로 넘어온 데이터를 삽입한다.
     //user id는 session에서 받아온다.
     const user_index = req.session.user_Id;
-    if(!user_index){
-      res.status(401).json({
-        code:401,
-        message : '로그인이 필요합니다.',
-        data : {},
-      });
-    }
+
     //review index는 req.params에 적혀있다.
     const rev_index = req.params.rev_idx;
 
