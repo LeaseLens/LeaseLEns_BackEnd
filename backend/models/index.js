@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const comment = require('./comment');
 const product = require('./product');
 const review  = require('./review');
+const favorite = require('./favorite');
 const user = require('./user');
 
 const env = process.env.NODE_ENV || 'development' || 'yerim';
