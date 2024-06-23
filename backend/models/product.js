@@ -15,7 +15,7 @@ module.exports = class Product extends Model{
         allowNull:false,
       },
       prod_img:{
-        type:DataTypes.STRING(255),
+        type:DataTypes.STRING(255), // BLOB에서 STRING으로 변경
         allowNull:false,
       },
       prod_name:{
