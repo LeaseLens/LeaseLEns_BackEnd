@@ -4,6 +4,10 @@ const db = require('../models'); // models 폴더에서 db 객체를 가져옵�
   try {
     await db.sequelize.sync(); // 모든 정의된 모델을 DB에 동기화합니다.
 
+    // products 테이블에 데이터가 있는지 확인
+    const existingProductsCount = await db.Product.count();
+    if (existingProductsCount === 0) {
+      // products 테이블이 비어 있는 경우에만 데이터 삽입
     const products = [
       {
         prod_category: '정수기',
@@ -179,7 +183,10 @@ const db = require('../models'); // models 폴더에서 db 객체를 가져옵�
       await db.Product.create(product);
     }
 
-    console.log('Products have been inserted successfully.');
+    console.log('성공적으로 데이터베이스에 기본 제품 데이터를 INSERT 하였습니다.');
+  }else{
+    console.log('기본 제품 데이터가 이미 존재합니다.');
+  }
   } catch (error) {
     next(err);
   }
