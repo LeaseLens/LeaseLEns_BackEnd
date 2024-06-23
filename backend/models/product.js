@@ -15,7 +15,7 @@ module.exports = class Product extends Model{
         allowNull:false,
       },
       prod_img:{
-        type:DataTypes.BLOB('long'),
+        type:DataTypes.STRING(255),
         allowNull:false,
       },
       prod_name:{
