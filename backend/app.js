@@ -3,17 +3,13 @@ const session = require('express-session');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const passport= require('passport')
-const multer = require('multer');
-const aws = require('aws-sdk');
-const multerS3 = require('multer-s3');
 
 const db =require('./models');
 const error404 = require('./Middlewares/error404');
 const handleError = require('./Middlewares/handleError');
 const passportConfig=require('./passport');
-const path= require('path')
-const MySQLStore = require('express-mysql-session')(session)
-
+const insertProducts = require('./seeders/insertProducts'); // 시더 파일을 가져옵니다.
+const MySQLStore = require('express-mysql-session')(session);
 
 const {userRouter, productRouter,renderRouter,reviewRouter}= require('./routes');
 
@@ -21,21 +17,11 @@ const PORT = 8080;
 
 dotenv.config();
 
-
-const env = process.env.NODE_ENV || 'development' || 'yerim';
+const env = process.env.NODE_ENV || 'yerim';
 const config = require('./config/config')[env];
 
 const app = express();
 passportConfig(); //passport config 초기화
-
-aws.config.update({
-  accessKeyId: process.env.AWS_S3_KEY_ID,
-  secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
-  region: process.env.AWS_S3_REGION,
-});
-
-//aws S3 인스턴스 생성
-const s3 = new aws.S3();
 
 //cookie parser를 활용하여 쿠키 해석하기
 app.use(express.json());
