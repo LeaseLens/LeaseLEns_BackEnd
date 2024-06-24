@@ -26,7 +26,7 @@ const upload = multer({
       cb(null, 'reviews/' + Date.now() + '-' + file.originalname); // 파일 이름 설정
     }
   })
-})
+});
 
 //reviews 게시판 페이지. 리뷰 조회, 리뷰 검색 등의 기능을 수행한다.
 exports.main = async (req,res,next) => {

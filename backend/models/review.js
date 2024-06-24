@@ -13,6 +13,7 @@ module.exports = class Review extends Model{
       rev_isAuth:{
         type:DataTypes.BOOLEAN,
         allowNull:false,
+        defaultValue:false,
       },
       rev_text : {
         type:DataTypes.TEXT,

@@ -16,6 +16,7 @@ const MySQLStore = require('express-mysql-session')(session)
 
 
 const {userRouter, productRouter,renderRouter,reviewRouter}= require('./routes');
+const AdminSetup = require('./adminSetup');
 
 const PORT = 8080;
 
@@ -76,6 +77,10 @@ db.sequelize
     console.log('db 연결 성공');
     app.listen(PORT,()=>{
       console.log(`${PORT}번 포트에서 서버 실행중 . . . `);
+    if(process.env.CREATE_ADMIN === 'true'){
+      const adminSetup = new AdminSetup();
+      adminSetup.createAdmin();                 //Create admin account on server start
+    }
     });
   }).catch(err=>{
     console.error('db 연결 실패', err);
