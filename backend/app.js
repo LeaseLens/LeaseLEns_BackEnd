@@ -10,8 +10,8 @@ const handleError = require('./Middlewares/handleError');
 const passportConfig=require('./passport');
 const insertProducts = require('./seeders/insertProducts'); // 시더 파일을 가져옵니다.
 const MySQLStore = require('express-mysql-session')(session);
-
-const {userRouter, productRouter,renderRouter,reviewRouter}= require('./routes');
+const {userRouter, productRouter,renderRouter,reviewRouter, adminReviewRouter}= require('./routes');
+const AdminSetup = require('./config/adminSetup');
 
 const PORT = 8080;
 
@@ -48,6 +48,7 @@ app.use(passport.session());
 app.use('/users', userRouter);
 app.use('/reviews',reviewRouter);
 app.use('/products', productRouter);
+app.use('/admin/reviews', adminReviewRouter);
 app.use('/', renderRouter);
 
 //404 에러처리 미들웨어
@@ -62,6 +63,10 @@ db.sequelize
     console.log('db 연결 성공');
     app.listen(PORT,()=>{
       console.log(`${PORT}번 포트에서 서버 실행중 . . . `);
+    if(process.env.CREATE_ADMIN === 'true'){
+      const adminSetup = new AdminSetup();
+      adminSetup.createAdmin();                 //Create admin account on server start
+    }
     });
   }).catch(err=>{
     console.error('db 연결 실패', err);
