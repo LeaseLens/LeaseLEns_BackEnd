@@ -21,6 +21,7 @@ exports.main = async (req,res, next) => {
         error:{}
       });
     }
+    
     //요청이 성공한 경우
   res.json({
     code:200,

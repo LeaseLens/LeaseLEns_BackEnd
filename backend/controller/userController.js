@@ -8,12 +8,20 @@ const handleError = require("../Middlewares/handleError");
 exports.register = async (req, res) => {
   const { user_name, user_ID, user_pw, confirm_pw } = req.body;
   if (user_pw !== confirm_pw) {
-    return res.status(400).json({ message: "비밀번호가 일치하지 않습니다" });
+    return res.status(400).json({
+      code:400,
+      message: "비밀번호가 일치하지 않습니다",
+      error:{}
+    });
   }
   try {
     const existingUser = await User.findOne({ where: { user_ID } });
     if (existingUser) {
-      return res.status(400).json({ message: "사용 중인 아이디입니다" });
+      return res.status(400).json({ 
+        code:400,
+        message: "사용 중인 아이디입니다",
+        error:{}
+      });
     }
 
     const hashedPassword = await bcrypt.hash(user_pw, 10);
