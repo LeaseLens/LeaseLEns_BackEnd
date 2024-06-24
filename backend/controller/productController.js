@@ -14,7 +14,13 @@ exports.main = async (req,res, next) => {
       where : condition,
       attributes: ['prod_index', 'prod_img', 'prod_name', 'prod_likes', 'prod_price'] // 필요한 필드 목록
     });
-
+    if(products.length===0){
+      return res.status(404).json({
+        code: 404,
+        message: '검색된 제품이 없습니다.',
+        error:{}
+      });
+    }
     //요청이 성공한 경우
   res.json({
     code:200,
@@ -79,7 +85,6 @@ exports.like = async(req,res,next)=>{
     const productId = req.params.prod_idx;
     console.log(productId);
     const userId = req.session.user_Id; //세션에 저장된 사용자 ID를 가져올 것.
-    console.log('실행됩니다~');
     const product = await Product.findByPk(productId);
     if (!product) {
       return res.status(404).json({
