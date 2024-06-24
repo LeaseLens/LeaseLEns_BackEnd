@@ -32,8 +32,11 @@ app.use(cookieParser());
 app.use(session({
   secret:process.env.COOKIE_SECRET,
   resave:false,
-  cookie:{ secure:false },          //HTTPS 사용할 때 값을 true로 바꿔주기
   saveUninitialized:true,           //MySQL database 연결할 때 database 이름 바꿔주기
+  cookie:{ 
+    maxAge:3600000,
+    secure:false,
+  },          //HTTPS 사용할 때 값을 true로 바꿔주기
     store: new MySQLStore({
       host: config.host,
       user: config.username,

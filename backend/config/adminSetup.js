@@ -2,7 +2,6 @@ const { User } = require('../models');
 const bcrypt = require('bcrypt');
 
 module.exports = class AdminSetup{
-    constructor() {}
     async createAdmin(){
         try{
             const adminExist= await User.findOne({ where : { user_ID: 'admin'} });
