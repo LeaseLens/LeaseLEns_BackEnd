@@ -25,7 +25,8 @@ const upload = multer({
     key: function(req, file, cb) {
       cb(null, 'reviews/' + Date.now() + '-' + file.originalname); // 파일 이름 설정
     }
-  })
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 } // 파일 크기 제한 (10MB)
 });
 
 //reviews 게시판 페이지. 리뷰 조회, 리뷰 검색 등의 기능을 수행한다.
@@ -123,6 +124,7 @@ exports.writeReview = (req, res, next) => {
         }
       });
     } catch (err) {
+      console.error('새로운 리뷰 생성 에러');
       next(err);
     }
   });

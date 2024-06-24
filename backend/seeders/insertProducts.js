@@ -1,6 +1,6 @@
 const db = require('../models'); // models 폴더에서 db 객체를 가져옵니다.
 
-(async () => {
+(async (req,res,next) => {
   try {
     await db.sequelize.sync(); // 모든 정의된 모델을 DB에 동기화합니다.
 
@@ -187,7 +187,8 @@ const db = require('../models'); // models 폴더에서 db 객체를 가져옵�
   }else{
     console.log('기본 제품 데이터가 이미 존재합니다.');
   }
-  } catch (error) {
+  } catch (err) {
+    console.log(err)
     next(err);
   }
 })();
