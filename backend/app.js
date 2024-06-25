@@ -31,8 +31,6 @@ db.sequelize
   
 passportConfig(); //passport config 초기화
 
-passportConfig(); //passport config 초기화
-
 //cookie parser를 활용하여 쿠키 해석하기
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
