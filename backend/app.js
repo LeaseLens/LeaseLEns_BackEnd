@@ -22,20 +22,22 @@ const config = require('./config/config')[env];
 
 const app = express();
 
+passportConfig(); //passport config 초기화
+
 //cookie parser를 활용하여 쿠키 해석하기
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 
 app.use(session({
   secret:process.env.COOKIE_SECRET,
   resave:false,
-  saveUninitialized:true, //MySQL database 연결할 때 database 이름 바꿔주기
+  saveUninitialized:false, // 로그인하지 않은 사용자에게 세션을 저장하지 않음
   cookie:{ 
     maxAge:3600000,
-    secure:false,
-  },          //HTTPS 사용할 때 값을 true로 바꿔주기
+    secure:false, //HTTPS 사용할 때 값을 true로 바꿔주기
+  },                 
     store: new MySQLStore({
       host: config.host,
       user: config.username,
@@ -47,7 +49,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passportConfig(); //passport config 초기화
+app.use((req, res, next) => {
+  console.log('Session:', req.session);
+  next();
+});
+
+app.use((req, res, next) => {
+  console.log('User:', req.user);
+  next();
+});
 
 
 app.use('/users', userRouter);
