@@ -28,6 +28,11 @@ module.exports = class User extends Model {
                 allowNull: false,
                 defaultValue: 0,
             },
+            // -----------------
+            role: {
+                type: DataTypes.STRING,
+                defaultValue: 'user' 
+            }
         }, {
             sequelize,
             modelName: 'User',

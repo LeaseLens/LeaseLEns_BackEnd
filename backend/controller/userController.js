@@ -1,19 +1,26 @@
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const { User } = require("../models");
-const { findOne } = require("../models/comment");
-const handleError = require("../Middlewares/handleError");
 
 //회원가입
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => {
+  console.log("Request Body:", req.body);
   const { user_name, user_ID, user_pw, confirm_pw } = req.body;
   if (user_pw !== confirm_pw) {
-    return res.status(400).json({ message: "비밀번호가 일치하지 않습니다" });
+    return res.status(400).json({
+      code:400,
+      message: "비밀번호가 일치하지 않습니다",
+      error:{}
+    });
   }
   try {
     const existingUser = await User.findOne({ where: { user_ID } });
     if (existingUser) {
-      return res.status(400).json({ message: "사용 중인 아이디입니다" });
+      return res.status(400).json({ 
+        code:400,
+        message: "사용 중인 아이디입니다",
+        error:{}
+      });
     }
 
     const hashedPassword = await bcrypt.hash(user_pw, 10);
@@ -23,9 +30,13 @@ exports.register = async (req, res) => {
       user_pw: hashedPassword,
       user_points: 0, //초기 포이트 0으로 설정
     });
-    res.status(201).json({ message: "회원 가입 성공", user: newUser });
-  } catch (error) {
-    handleError(error, req, res);
+    res.status(201).json({ 
+      code:201,
+      message: "회원 가입 성공", 
+      data : {user:newUser} 
+    });
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -33,53 +44,68 @@ exports.register = async (req, res) => {
 exports.login = (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
-     next(err)
+      return next(err);
     }
     if (!user) {
-      return res.status(401).json({ message: info.message });
+      return res.status(401).json({ 
+        code : 401,
+        message: info.message,
+        data:{}
+      });
     }
     return req.login(user, (loginErr) => {
-      console.log('req.login user', user)
       if (loginErr) {
-        return handleError(loginErr, req, res);
+        return next(loginErr);
       }
-      return res.status(200).json({ message: "로그인 성공", user });
+      return res.status(200).json({
+        code:200,
+        message: "로그인 성공",
+        data:{
+          user : user,
+          session : req.session.passport.user
+        } });
     });
   })(req, res, next);
 };
 
 //로그아웃
-exports.logout = (req, res) => {
+exports.logout = (req, res, next) => {
 
   req.logout((err) => {
     if (err) {
-      return res
-        .status(500)
-        .json({ message: "로그아웃 중 오류가 발생했습니다." });
+      return next(err);
     }
     req.session.destroy();
-    res.status(200).json({ message: "로그아웃 성공" });
+    res.status(200).json({ 
+      code:200,
+      message: "로그아웃 성공",
+      data:{}
+    });
   });
 };
 
 //회원탈퇴
-exports.quit = async (req, res) => {
+exports.quit = async (req, res, next) => {
   try {
     const userId = req.user.user_index;
     await User.destroy({ where: { user_index: userId } });
     req.logout(function (err) {
       if (err) {
-        return handleError(err, req, res);
+        return next(err);
       }
 
       req.session.destroy((err) => {
         if (err) {
-          return handleError(err, req, res);
+          return next(err);
         }
-        res.status(200).json({ message: "회원탈퇴 성공" });
+        res.status(200).json({ 
+          code:200,
+          message: "회원탈퇴 성공",
+          data:{}
+        });
       });
     });
-  } catch (error) {
-    handleError(error, req, res);
+  } catch (err) {
+    next(err);
   }
 };

@@ -1,4 +1,4 @@
-const {Review, Product, User, Comment, Favorite} = require('../models');
+const {Review, Product, User, Favorite} = require('../models');
 //메인 페이지 렌더링
 exports.main = async(req,res,next) => {
   //response에 
@@ -31,7 +31,7 @@ exports.main = async(req,res,next) => {
 //마이 페이지 렌더링
 exports.mypage = async(req,res,next) =>{
   try{
-    const user_index = req.session.user_Id;
+    const user_index = req.session.passport.user;
     //user_index에 해당하는 User 테이블의 user_name, user_ID, user_points
     const userInfo = await User.findOne({
       where:{ user_index },
@@ -52,7 +52,7 @@ exports.mypage = async(req,res,next) =>{
     // user_index에 해당하는 Review 테이블의 rev_title, rev_name, rev_createdAt
     const userReviews = await Review.findAll({
       where: { user_index },
-      attributes: ['rev_title', 'rev_name', 'rev_createdAt']
+      attributes: ['rev_title', 'rev_createdAt']
     });    
     // 응답 데이터 구성
     res.json({

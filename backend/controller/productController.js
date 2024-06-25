@@ -14,7 +14,14 @@ exports.main = async (req,res, next) => {
       where : condition,
       attributes: ['prod_index', 'prod_img', 'prod_name', 'prod_likes', 'prod_price'] // 필요한 필드 목록
     });
-
+    if(products.length===0){
+      return res.status(404).json({
+        code: 404,
+        message: '검색된 제품이 없습니다.',
+        error:{}
+      });
+    }
+    
     //요청이 성공한 경우
   res.json({
     code:200,
@@ -35,22 +42,9 @@ exports.details = async (req,res, next) =>{
     //제품 인덱스에 해당하는 값을 파라미터로 받는다.
     const productId = req.params.prod_idx;
     
-    //제품의 상세정보를 조회합니다.
+    // 제품의 상세정보를 조회합니다.
     const productDetail = await Product.findByPk(productId, {
-      //product의 prod_img(사진), prod_name(제목), prod_price(비용), prod_likes(좋아요), prod_price(텍스트)를 전송합니다.
-      attributes : ['prod_img','prod_name','prod_price','prod_likes'],
-      //review의 rev_img(후기사진), rev_rating(별점), rev_title(제목), rev_text(텍스트)를 전송합니다.
-
-      include: [
-        {
-          model: Review,
-          attributes: ['rev_img', 'rev_rating', 'rev_title', 'rev_text'],
-          where: {
-            prod_index: productId,
-            rev_isAuth: true // rev_isAuth가 참인 값만 가져옵니다.
-          }
-        }
-      ]
+      attributes: ['prod_img', 'prod_name', 'prod_price', 'prod_likes']
     });
 
     //실패할 경우(전송받은 데이터가 비어있을 경우)
@@ -61,12 +55,23 @@ exports.details = async (req,res, next) =>{
         error:{}
       });
     }
+
+    // 제품에 대한 리뷰를 조회합니다.
+    const reviews = await Review.findAll({
+      where: {
+        prod_index: productId,
+        rev_isAuth: true // rev_isAuth가 참인 값만 가져옵니다.
+      },
+      attributes: ['rev_img', 'rev_rating', 'rev_title', 'rev_text']
+    });    
+
     //성공 시
     res.json({
       code: 200,
       message: '성공적으로 제품 상세 데이터를 전송하였습니다.',
       data: {
-        productDetail: productDetail // 검색된 상세 정보를 productDetail의 키로 넣어줍니다.
+        productDetail: productDetail, // 검색된 상세 정보를 productDetail의 키로 넣어줍니다.
+        reviews : reviews
       }
     });
 
@@ -79,8 +84,8 @@ exports.details = async (req,res, next) =>{
 exports.like = async(req,res,next)=>{
   try{
     const productId = req.params.prod_idx;
-    const userId = req.session.user_Id; //세션에 저장된 사용자 ID를 가져올 것.
-
+    console.log(productId);
+    const userId = req.session.passport.user; //세션에 저장된 사용자 ID를 가져올 것.
     const product = await Product.findByPk(productId);
     if (!product) {
       return res.status(404).json({
@@ -97,18 +102,28 @@ exports.like = async(req,res,next)=>{
         error: {}
       });
     }
+    // 사용자가 해당 제품을 찜했는지 확인
+    const isLiked = await user.hasProduct(product);    
 
-     // Sequelize의 add 메서드를 통해 연결. favorites 중간 테이블에 추가할 예정.
-    await user.addProduct(product);
-
-     // 성공적으로 연결되었음을 확인할 수 있음
-    res.json({
-      code: 200,
-      message: '제품을 찜했습니다.',
-      data: {
-        product: product // product 정보 반환
-      }
-    });
+    if (isLiked) {
+      // 이미 찜한 제품이라면 찜 해제 (Favorites 테이블에서 삭제)
+      await user.removeProduct(product);
+      return res.json({
+        code: 200,
+        message: '제품 찜을 해제했습니다.',
+        data: {}
+      });
+    } else {
+      // 찜하지 않은 제품이라면 찜 추가 (Favorites 테이블에 추가)
+      await user.addProduct(product);
+      return res.json({
+        code: 200,
+        message: '제품을 찜했습니다.',
+        data: {
+          product: product
+        }
+      });
+    }
   }catch(err){
     next(err);
   }
