@@ -42,13 +42,16 @@ exports.verifyReview = async (req,res,next)=>{
         res.status(200).json({
             code: 200,
             message: '리뷰가 인증되었습니다!',
+            data:{}
         });
     }catch(error){
         console.log(error);
         res.status(500).json({
             code: 500,
             message: '서버 오류',
-            error: error.message,
+            error: {
+              message:error.message
+            },
         });
     }
 };

@@ -1,4 +1,4 @@
-const {Review, Product, User, Comment, Favorite} = require('../models');
+const {Review, Product, User, Favorite} = require('../models');
 //메인 페이지 렌더링
 exports.main = async(req,res,next) => {
   //response에 
