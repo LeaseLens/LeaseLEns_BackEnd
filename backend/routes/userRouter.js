@@ -3,6 +3,8 @@ const router = express.Router();
 const controller = require('../controller/userController');
 const isLoggedIn = require('../Middlewares/isLoggedIn');
 const isNotLoggedIn = require('../Middlewares/isNotLoggedIn');
+const isAdmin = require('../Middlewares/isAdmin');
+
 
 // 회원가입
 router.post('/register', isNotLoggedIn, controller.register);
