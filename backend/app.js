@@ -21,7 +21,6 @@ const env = process.env.NODE_ENV || 'yerim';
 const config = require('./config/config')[env];
 
 const app = express();
-passportConfig(); //passport config 초기화
 
 //cookie parser를 활용하여 쿠키 해석하기
 app.use(express.json());
@@ -32,7 +31,7 @@ app.use(cookieParser());
 app.use(session({
   secret:process.env.COOKIE_SECRET,
   resave:false,
-  saveUninitialized:true,           //MySQL database 연결할 때 database 이름 바꿔주기
+  saveUninitialized:true, //MySQL database 연결할 때 database 이름 바꿔주기
   cookie:{ 
     maxAge:3600000,
     secure:false,
@@ -47,6 +46,9 @@ app.use(session({
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+passportConfig(); //passport config 초기화
+
 
 app.use('/users', userRouter);
 app.use('/reviews',reviewRouter);

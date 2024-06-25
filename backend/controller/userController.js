@@ -62,7 +62,7 @@ exports.login = (req, res, next) => {
         message: "로그인 성공",
         data:{
           user : user,
-          session : req.session
+          session : req.session.passport.user
         } });
     });
   })(req, res, next);
