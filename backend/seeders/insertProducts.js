@@ -187,8 +187,7 @@ const db = require('../models'); // models 폴더에서 db 객체를 가져옵�
   }else{
     console.log('기본 제품 데이터가 이미 존재합니다.');
   }
-  } catch (err) {
-    console.log(err)
+  } catch (error) {
     next(err);
   }
 })();
