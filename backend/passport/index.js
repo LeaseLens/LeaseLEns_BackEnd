@@ -4,8 +4,7 @@ const { User } = require('../models');
 
 module.exports = () => {
   //사용자 객체를 세션에 저장할 때 호출.
-  passport.serializeUser((user, done) => {
-    console.log(user) 
+  passport.serializeUser((user, done) => { 
     done(null, user.user_index); // 사용자의 id를 세션에 저장
   });
 
