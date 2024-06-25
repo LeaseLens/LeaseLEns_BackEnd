@@ -209,7 +209,6 @@ exports.reviewDetails = async (req,res,next) =>{
     //rev_index에 해당하는 리뷰의 rev_isAuth, rev_text,rev_img,rev_title,rev_rating 조회
     //rev_index의 테이블에 attribute로 있는 prod_idx에 해당하는 product 테이블의 prod_name 조회
     //comment 테이블에 rev_idx가 현재 rev_index와 같은 모든 행의 com_text, com_date, user_index에 해당하는 user 테이블의 user_ID 조회.
-    console.log("review = await 진입");
     const review = await Review.findOne({
       where: { rev_index },
       attributes: ['rev_isAuth', 'rev_text', 'rev_img', 'rev_title', 'rev_rating'],
@@ -221,7 +220,7 @@ exports.reviewDetails = async (req,res,next) =>{
         },
         {
           model: Comment,
-          attributes: ['com_text', 'com_createdAt'],
+          attributes: ['com_text', 'createdAt'],
           include: [
             {
               model: User,
@@ -240,7 +239,6 @@ exports.reviewDetails = async (req,res,next) =>{
         data: {}
       });
     }    
-
     // 요청 성공
     res.json({
       code: 200,
@@ -260,7 +258,7 @@ exports.writeComments = async(req,res,next)=>{
   try {
     //comments 테이블에 req.body로 넘어온 데이터를 삽입한다.
     //user id는 session에서 받아온다.
-    const user_index = req.session.user_Id;
+    const user_index = req.session.passport.user;
 
     //review index는 req.params에 적혀있다.
     const rev_index = req.params.rev_idx;
@@ -299,7 +297,7 @@ exports.writeComments = async(req,res,next)=>{
 //리뷰 댓글 수정하기
 exports.updateComments = async (req,res,next)=>{
   try{
-    const user_index = req.session.user_Id; //로그인된 사용자가 작성한 댓글이 맞는지 확인해줄 것.
+    const user_index = req.session.passport.user; //로그인된 사용자가 작성한 댓글이 맞는지 확인해줄 것.
     const rev_index = req.params.rev_idx;
     const com_index = req.params.com_idx;
     const { com_text } = req.body;  
@@ -352,7 +350,7 @@ exports.updateComments = async (req,res,next)=>{
 //리뷰 댓글 삭제하기
 exports.deleteComments = async(req,res,next)=>{
   try{
-    const user_index = req.session.user_Id;
+    const user_index = req.session.passport.user;
     const com_index = req.params.com_idx;
     const rev_index = req.params.rev_idx;  
 
