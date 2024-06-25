@@ -13,7 +13,7 @@ router.post('/register', isNotLoggedIn, controller.register);
 router.post('/login', isNotLoggedIn, controller.login);
 
 // 로그아웃
-router.get('/logout', isLoggedIn, controller.logout);
+router.get('/logout', isLoggedIn, isAdmin, controller.logout);
 
 // 회원탈퇴
 router.delete('/quit', isLoggedIn, controller.quit);

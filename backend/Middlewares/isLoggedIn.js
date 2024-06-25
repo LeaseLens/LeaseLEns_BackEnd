@@ -1,7 +1,7 @@
 module.exports = (req, res, next) => {
   console.log('isAuthenticated:', req.isAuthenticated());
     if (req.isAuthenticated()) {
-      return next();
+      next();
     } else {
       return res.status(401).json({
         code: 401,
