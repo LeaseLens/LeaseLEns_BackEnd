@@ -27,7 +27,7 @@ const upload = multer({
     }
   }),
   limits: { fileSize: 10 * 1024 * 1024 } // 파일 크기 제한 (10MB)
-});
+}).fields([{ name: 'rev_img', maxCount: 3 }, { name: 'rev_authImg', maxCount: 3 }]);
 
 //reviews 게시판 페이지. 리뷰 조회, 리뷰 검색 등의 기능을 수행한다.
 exports.main = async (req,res,next) => {
@@ -70,21 +70,17 @@ exports.main = async (req,res,next) => {
   }
 }
 
-//review 작성하기(제출)
-// 리뷰 작성하기(제출)
+// 리뷰 작성하기
 exports.writeReview = (req, res, next) => {
-
-  const user_index = req.session.user_Id;
-
-  // 이미지 업로드 처리
-  upload.fields([{ name: 'rev_img', maxCount: 3 }, { name: 'rev_authImg', maxCount: 3 }])(req, res, async function(err) {
+  upload(req, res, async function (err) {
     if (err) {
-      next(err);
+      return next(err); // 오류가 발생한 경우, 다음 미들웨어로 전달합니다.
     }
 
     try {
+      const user_index = req.session.passport.user;
       const { rev_title, prod_index, rev_text, rev_rating } = req.body;
-
+      console.log(rev_title, rev_text, prod_index, rev_rating);
       // 필수 데이터 검사
       if (!rev_title || !prod_index || !rev_text || !rev_rating) {
         return res.status(400).json({
@@ -98,7 +94,7 @@ exports.writeReview = (req, res, next) => {
       const rev_img_urls = req.files['rev_img'] ? req.files['rev_img'].map(file => file.location) : [];
       const rev_authImg_urls = req.files['rev_authImg'] ? req.files['rev_authImg'].map(file => file.location) : [];
 
-      // 쉼표로 구분된 문자열로 결합.
+      // 쉼표로 구분된 문자열로 결합
       const rev_img = rev_img_urls.join(',');
       const rev_authImg = rev_authImg_urls.join(',');
 
@@ -124,8 +120,8 @@ exports.writeReview = (req, res, next) => {
         }
       });
     } catch (err) {
-      console.error('새로운 리뷰 생성 에러');
-      next(err);
+      console.error('새로운 리뷰 생성 에러', err);
+      next(err); // 오류가 발생한 경우, 다음 미들웨어로 전달합니다.
     }
   });
 };
@@ -135,7 +131,7 @@ exports.deleteReview = async(req, res, next) =>{
   try{
     //req.params를 통해 어떤 rev_index인지 받아온다.
     //reviews 테이블 삭제(req에서 받아온 rev_index 사용)
-    const user_index = req.session.user_Id;
+    const user_index = req.session.passport.user;
     const rev_index = req.params.rev_idx;
 
     //해당 리뷰를 작성한 사람이 현재 로그인된 사람인지 확인한다.
