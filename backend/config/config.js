@@ -27,7 +27,7 @@ module.exports = {
   yerim:{
     username:'root',
     password:'1234',
-    database:'kdt',
+    database:'test',
     host:'localhost',
     dialect:'mysql'
   }
