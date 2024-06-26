@@ -12,7 +12,7 @@ exports.main = async (req,res, next) => {
     //제품 목록 가져오기
     const products = await Product.findAll({
       where : condition,
-      attributes: ['prod_index', 'prod_img', 'prod_name', 'prod_likes', 'prod_price'] // 필요한 필드 목록
+      attributes: ['prod_idx', 'prod_img', 'prod_name', 'prod_likes', 'prod_price'] // 필요한 필드 목록
     });
     if(products.length===0){
       return res.status(404).json({
@@ -59,7 +59,7 @@ exports.details = async (req,res, next) =>{
     // 제품에 대한 리뷰를 조회합니다.
     const reviews = await Review.findAll({
       where: {
-        prod_index: productId,
+        prod_idx: productId,
         rev_isAuth: true // rev_isAuth가 참인 값만 가져옵니다.
       },
       attributes: ['rev_img', 'rev_rating', 'rev_title', 'rev_text']

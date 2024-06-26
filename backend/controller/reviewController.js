@@ -31,9 +31,9 @@ const upload = multer({
 
 //reviews 게시판 페이지. 리뷰 조회, 리뷰 검색 등의 기능을 수행한다.
 exports.main = async (req,res,next) => {
-  //reviews 테이블의 rev_index(리뷰 인덱스), rev_date(작성일), rev_title(리뷰 제목), rev_isAuth(인증 여부),
-  //reviews 테이블의 user_index에 해당하는 users 테이블의 user_ID(유저 아이디),
-  //reviews 테이블의 prod_index에 해당하는 products 테이블의 prod_name(제품명)
+  //reviews 테이블의 rev_idx(리뷰 인덱스), rev_date(작성일), rev_title(리뷰 제목), rev_isAuth(인증 여부),
+  //reviews 테이블의 user_idx에 해당하는 users 테이블의 user_ID(유저 아이디),
+  //reviews 테이블의 prod_idx에 해당하는 products 테이블의 prod_name(제품명)
   try{
     //리뷰 제목 검색하기. default 값은 all
     const title = req.query.title || 'all';
@@ -44,12 +44,12 @@ exports.main = async (req,res,next) => {
     //리뷰 목록 가져오기
     const reviews = await Review.findAll({
       where: condition,
-      attributes:['rev_index', 'rev_createdAt', 'rev_title', 'rev_isAuth'],
+      attributes:['rev_idx', 'rev_createdAt', 'rev_title', 'rev_isAuth'],
       include: [
         {
           model: User,
           attributes: ['user_ID'],
-          required: true // user_index에 해당하는 user가 없는 경우 제외
+          required: true // user_idx에 해당하는 user가 없는 경우 제외
         },
         {
           model: Product,
@@ -78,11 +78,11 @@ exports.writeReview = (req, res, next) => {
     }
 
     try {
-      const user_index = req.session.passport.user;
-      const { rev_title, prod_index, rev_text, rev_rating } = req.body;
-      console.log(rev_title, rev_text, prod_index, rev_rating);
+      const user_idx = req.session.passport.user;
+      const { rev_title, prod_idx, rev_text, rev_rating } = req.body;
+      console.log(rev_title, rev_text, prod_idx, rev_rating);
       // 필수 데이터 검사
-      if (!rev_title || !prod_index || !rev_text || !rev_rating) {
+      if (!rev_title || !prod_idx || !rev_text || !rev_rating) {
         return res.status(400).json({
           code: 400,
           message: '필수 필드를 모두 입력해 주세요.',
@@ -101,8 +101,8 @@ exports.writeReview = (req, res, next) => {
       // 새로운 리뷰 생성
       const newReview = await Review.create({
         rev_title,
-        user_index,
-        prod_index,
+        user_idx,
+        prod_idx,
         rev_isAuth: false, // 기본값
         rev_text,
         rev_createdAt: new Date(), // 현재 날짜 시간
@@ -129,15 +129,15 @@ exports.writeReview = (req, res, next) => {
 //review 글 삭제하기
 exports.deleteReview = async(req, res, next) =>{
   try{
-    //req.params를 통해 어떤 rev_index인지 받아온다.
-    //reviews 테이블 삭제(req에서 받아온 rev_index 사용)
-    const user_index = req.session.passport.user;
-    const rev_index = req.params.rev_idx;
+    //req.params를 통해 어떤 rev_idx인지 받아온다.
+    //reviews 테이블 삭제(req에서 받아온 rev_idx 사용)
+    const user_idx = req.session.passport.user;
+    const rev_idx = req.params.rev_idx;
 
     //해당 리뷰를 작성한 사람이 현재 로그인된 사람인지 확인한다.
 
     //해당 리뷰가 있는지 확인한다.
-    const review = await Review.findByPk(rev_index);
+    const review = await Review.findByPk(rev_idx);
     if(!review){
       return res.status(404).json({
         code:404,
@@ -146,7 +146,7 @@ exports.deleteReview = async(req, res, next) =>{
       })
     }
   //해당 리뷰를 작성한 사람이 현재 로그인된 사람인지 확인한다.
-    if (review.user_index !== user_index) {
+    if (review.user_idx !== user_idx) {
       return res.status(403).json({
         code: 403,
         message: '리뷰를 삭제할 권한이 없습니다.',
@@ -177,17 +177,17 @@ exports.deleteReview = async(req, res, next) =>{
       }
     }
 
-    //comments 테이블의 rev_index 값이 현재 rev_index값과 같은 행 모두 삭제
+    //comments 테이블의 rev_idx 값이 현재 rev_idx값과 같은 행 모두 삭제
     await Comment.destroy({
       where: {
-        rev_index: rev_index
+        rev_idx: rev_idx
       }
     });
 
     // reviews 테이블에서 해당 리뷰 삭제
     await Review.destroy({
       where: {
-        rev_index: rev_index
+        rev_idx: rev_idx
       }
     });
     // 요청이 성공한 경우
@@ -205,12 +205,12 @@ exports.deleteReview = async(req, res, next) =>{
 exports.reviewDetails = async (req,res,next) =>{
   try{
     //파라미터로 리뷰의 인덱스를 받는다.
-    const rev_index = req.params.rev_idx;
-    //rev_index에 해당하는 리뷰의 rev_isAuth, rev_text,rev_img,rev_title,rev_rating 조회
-    //rev_index의 테이블에 attribute로 있는 prod_idx에 해당하는 product 테이블의 prod_name 조회
-    //comment 테이블에 rev_idx가 현재 rev_index와 같은 모든 행의 com_text, com_date, user_index에 해당하는 user 테이블의 user_ID 조회.
+    const rev_idx = req.params.rev_idx;
+    //rev_idx에 해당하는 리뷰의 rev_isAuth, rev_text,rev_img,rev_title,rev_rating 조회
+    //rev_idx의 테이블에 attribute로 있는 prod_idx에 해당하는 product 테이블의 prod_name 조회
+    //comment 테이블에 rev_idx가 현재 rev_idx와 같은 모든 행의 com_text, com_date, user_idx에 해당하는 user 테이블의 user_ID 조회.
     const review = await Review.findOne({
-      where: { rev_index },
+      where: { rev_idx },
       attributes: ['rev_isAuth', 'rev_text', 'rev_img', 'rev_title', 'rev_rating'],
       include: [
         {
@@ -258,10 +258,10 @@ exports.writeComments = async(req,res,next)=>{
   try {
     //comments 테이블에 req.body로 넘어온 데이터를 삽입한다.
     //user id는 session에서 받아온다.
-    const user_index = req.session.passport.user;
+    const user_idx = req.session.passport.user;
 
     //review index는 req.params에 적혀있다.
-    const rev_index = req.params.rev_idx;
+    const rev_idx = req.params.rev_idx;
 
     const {com_text} = req.body;
 
@@ -276,8 +276,8 @@ exports.writeComments = async(req,res,next)=>{
 
     // 새로운 댓글 생성
     const newComment = await Comment.create({
-      rev_index,
-      user_index,
+      rev_idx,
+      user_idx,
       com_text,
       com_createdAt: new Date() // 현재 날짜 시간
     });
@@ -297,9 +297,9 @@ exports.writeComments = async(req,res,next)=>{
 //리뷰 댓글 수정하기
 exports.updateComments = async (req,res,next)=>{
   try{
-    const user_index = req.session.passport.user; //로그인된 사용자가 작성한 댓글이 맞는지 확인해줄 것.
-    const rev_index = req.params.rev_idx;
-    const com_index = req.params.com_idx;
+    const user_idx = req.session.passport.user; //로그인된 사용자가 작성한 댓글이 맞는지 확인해줄 것.
+    const rev_idx = req.params.rev_idx;
+    const com_idx = req.params.com_idx;
     const { com_text } = req.body;  
 
     // 필수 데이터 확인
@@ -314,9 +314,9 @@ exports.updateComments = async (req,res,next)=>{
     // 댓글 업데이트
     const updatedComment = await Comment.findOne({
       where: {
-        com_index,
-        rev_index,
-        user_index
+        com_idx,
+        rev_idx,
+        user_idx
       }
     });    
 
@@ -350,15 +350,15 @@ exports.updateComments = async (req,res,next)=>{
 //리뷰 댓글 삭제하기
 exports.deleteComments = async(req,res,next)=>{
   try{
-    const user_index = req.session.passport.user;
-    const com_index = req.params.com_idx;
-    const rev_index = req.params.rev_idx;  
+    const user_idx = req.session.passport.user;
+    const com_idx = req.params.com_idx;
+    const rev_idx = req.params.rev_idx;  
 
         // 댓글을 찾습니다.
     const comment = await Comment.findOne({
       where: {
-        com_index,
-        rev_index
+        com_idx,
+        rev_idx
       }
     });
 
@@ -372,7 +372,7 @@ exports.deleteComments = async(req,res,next)=>{
     }    
 
     // 댓글 작성자가 현재 로그인된 사용자와 일치하는지 확인합니다.
-    if (comment.user_index !== user_index) {
+    if (comment.user_idx !== user_idx) {
       return res.status(403).json({
         code: 403,
         message: '댓글을 삭제할 권한이 없습니다.',
@@ -383,9 +383,9 @@ exports.deleteComments = async(req,res,next)=>{
     // 댓글을 삭제합니다.
     await Comment.destroy({
       where: {
-        com_index,
-        rev_index,
-        user_index
+        com_idx,
+        rev_idx,
+        user_idx
       }
     });
 
