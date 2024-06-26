@@ -4,7 +4,7 @@ const {Model} =DataTypes;
 module.exports = class User extends Model {
     static init(sequelize) {
         return super.init({
-            user_index: {
+            user_idx: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 autoIncrement: true,
@@ -43,8 +43,8 @@ module.exports = class User extends Model {
     }
 
     static associate(db) {
-        db.User.hasMany(db.Review, { foreignKey: 'user_index' });
-        db.User.hasMany(db.Comment, { foreignKey: 'user_index' });
-        db.User.belongsToMany(db.Product, { through: 'favorites', foreignKey: 'user_index' });
+        db.User.hasMany(db.Review, { foreignKey: 'user_idx' });
+        db.User.hasMany(db.Comment, { foreignKey: 'user_idx' });
+        db.User.belongsToMany(db.Product, { through: 'favorites', foreignKey: 'user_idx' });
     }
 };

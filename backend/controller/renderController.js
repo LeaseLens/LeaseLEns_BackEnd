@@ -31,27 +31,27 @@ exports.main = async(req,res,next) => {
 //마이 페이지 렌더링
 exports.mypage = async(req,res,next) =>{
   try{
-    const user_index = req.session.passport.user;
-    //user_index에 해당하는 User 테이블의 user_name, user_ID, user_points
+    const user_idx = req.session.passport.user;
+    //user_idx에 해당하는 User 테이블의 user_name, user_ID, user_points
     const userInfo = await User.findOne({
-      where:{ user_index },
+      where:{ user_idx },
       attributes : ['user_name', 'user_ID', 'user_points'] 
     });
-    // user_index에 해당하는 Favorite 테이블에서 prod_index 가져오기
+    // user_idx에 해당하는 Favorite 테이블에서 prod_idx 가져오기
     const userFavorites = await Favorite.findAll({
-      where: { user_index },
-      attributes: ['prod_index']
+      where: { user_idx },
+      attributes: ['prod_idx']
     });    
 
-    //user_index에 포함되는 Favorite 테이블의 user_index에 해당하는 prod_index에 해당하는 prod_img, prod_name
+    //user_idx에 포함되는 Favorite 테이블의 user_idx에 해당하는 prod_idx에 해당하는 prod_img, prod_name
     const favoriteProducts = await Product.findAll({
-      where:{prod_index : userFavorites.map(fav => fav.prod_index) },
+      where:{prod_idx : userFavorites.map(fav => fav.prod_idx) },
       attributes:['prod_img','prod_name']
     });
 
-    // user_index에 해당하는 Review 테이블의 rev_title, rev_name, rev_createdAt
+    // user_idx에 해당하는 Review 테이블의 rev_title, rev_name, rev_createdAt
     const userReviews = await Review.findAll({
-      where: { user_index },
+      where: { user_idx },
       attributes: ['rev_title', 'rev_createdAt']
     });    
     // 응답 데이터 구성

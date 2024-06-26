@@ -35,7 +35,7 @@ exports.getReviewDetails = async (req, res) => {
   console.log("req.params.id: " , req.params.id)
   try {
     const review = await Review.findOne({
-      where: { rev_index: req.params.id },
+      where: { rev_idx: req.params.id },
       include: [
         {
           model: User,
@@ -70,7 +70,7 @@ exports.getReviewDetails = async (req, res) => {
 // 리뷰 인증 처리
 exports.verifyReview = async (req, res) => {
   try {
-    const review = await Review.findOne({ where: { rev_index: req.params.id } });
+    const review = await Review.findOne({ where: { rev_idx: req.params.id } });
     if (!review) {
       return res.status(404).json({
         code: 404,
