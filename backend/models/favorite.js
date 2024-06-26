@@ -4,12 +4,12 @@ const { Model } = DataTypes;
 module.exports = class Favorite extends Model {
   static init(sequelize){
     return super.init({
-      user_index: {
+      user_idx: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false,
       },
-      prod_index: {
+      prod_idx: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false,
@@ -24,7 +24,7 @@ module.exports = class Favorite extends Model {
     });
   }
   static associate(db){
-    db.Favorite.belongsTo(db.User, { foreignKey: 'user_index' });
-    db.Favorite.belongsTo(db.Product, { foreignKey: 'prod_index' });
+    db.Favorite.belongsTo(db.User, { foreignKey: 'user_idx' });
+    db.Favorite.belongsTo(db.Product, { foreignKey: 'prod_idx' });
   }
 }
