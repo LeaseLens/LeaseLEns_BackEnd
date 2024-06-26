@@ -46,7 +46,7 @@ exports.mypage = async(req,res,next) =>{
     //user_idx에 포함되는 Favorite 테이블의 user_idx에 해당하는 prod_idx에 해당하는 prod_img, prod_name
     const favoriteProducts = await Product.findAll({
       where:{prod_idx : userFavorites.map(fav => fav.prod_idx) },
-      attributes:['prod_img','prod_name']
+      attributes:['prod_idx','prod_img','prod_name']
     });
 
     // user_idx에 해당하는 Review 테이블의 rev_title, rev_name, rev_createdAt
