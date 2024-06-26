@@ -10,7 +10,7 @@ router.get('/', isAdmin, adminReviewController.getUnverifiedReviews);
 router.get('/:id', isAdmin, adminReviewController.getReviewDetails);
 
 // 리뷰 인증 처리
-router.post('/:id/verify', isAdmin, adminReviewController.verifyReview);
+router.post('/:id/auth', isAdmin, adminReviewController.verifyReview);
 
 
 module.exports = router;
