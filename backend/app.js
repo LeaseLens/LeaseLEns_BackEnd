@@ -3,6 +3,7 @@ const session = require('express-session');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const passport= require('passport')
+const cors = require('cors');
 
 const db =require('./models');
 const error404 = require('./Middlewares/error404');
@@ -31,11 +32,15 @@ db.sequelize
   
 passportConfig(); //passport config 초기화
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
+
 //cookie parser를 활용하여 쿠키 해석하기
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
-
 
 app.use(session({
   secret:process.env.COOKIE_SECRET,
@@ -44,6 +49,7 @@ app.use(session({
   cookie:{ 
     maxAge:3600000,
     secure:false, //HTTPS 사용할 때 값을 true로 바꿔주기
+    httpOnly:true,
   },                 
     store: new MySQLStore({
       host: config.host,
@@ -55,17 +61,6 @@ app.use(session({
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use((req, res, next) => {
-  console.log('Session:', req.session);
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log('User:', req.user);
-  next();
-});
-
 
 app.use('/users', userRouter);
 app.use('/reviews',reviewRouter);

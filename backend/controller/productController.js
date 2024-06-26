@@ -102,18 +102,28 @@ exports.like = async(req,res,next)=>{
         error: {}
       });
     }
+    // 사용자가 해당 제품을 찜했는지 확인
+    const isLiked = await user.hasProduct(product);    
 
-     // Sequelize의 add 메서드를 통해 연결. favorites 중간 테이블에 추가할 예정.
-    await user.addProduct(product);
-
-     // 성공적으로 연결되었음을 확인할 수 있음
-    res.json({
-      code: 200,
-      message: '제품을 찜했습니다.',
-      data: {
-        product: product // product 정보 반환
-      }
-    });
+    if (isLiked) {
+      // 이미 찜한 제품이라면 찜 해제 (Favorites 테이블에서 삭제)
+      await user.removeProduct(product);
+      return res.json({
+        code: 200,
+        message: '제품 찜을 해제했습니다.',
+        data: {}
+      });
+    } else {
+      // 찜하지 않은 제품이라면 찜 추가 (Favorites 테이블에 추가)
+      await user.addProduct(product);
+      return res.json({
+        code: 200,
+        message: '제품을 찜했습니다.',
+        data: {
+          product: product
+        }
+      });
+    }
   }catch(err){
     next(err);
   }
