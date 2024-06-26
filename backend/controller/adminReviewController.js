@@ -32,6 +32,7 @@ exports.getUnverifiedReviews = async (req, res) => {
 
 // 특정 리뷰 상세 조회
 exports.getReviewDetails = async (req, res) => {
+  console.log("req.params.id: " , req.params.id)
   try {
     const review = await Review.findOne({
       where: { rev_index: req.params.id },

@@ -70,7 +70,7 @@ app.use((req, res, next) => {
 app.use('/users', userRouter);
 app.use('/reviews',reviewRouter);
 app.use('/products', productRouter);
-app.use('/admin/reviews', adminReviewRouter);
+app.use('/admin', adminReviewRouter);
 app.use('/', renderRouter);
 
 //404 에러처리 미들웨어
