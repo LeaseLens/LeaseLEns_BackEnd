@@ -12,7 +12,7 @@ exports.main = async(req,res,next) => {
 
     // product 테이블에서 필요한 데이터 가져오기
     const products = await Product.findAll({
-      attributes: ['prod_img', 'prod_name']
+      attributes: ['prod_img', 'prod_name','prod_text']
     });
 
     // 응답 데이터 구성

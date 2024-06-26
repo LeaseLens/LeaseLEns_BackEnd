@@ -44,7 +44,7 @@ exports.details = async (req,res, next) =>{
     
     // 제품의 상세정보를 조회합니다.
     const productDetail = await Product.findByPk(productId, {
-      attributes: ['prod_img', 'prod_name', 'prod_price', 'prod_likes']
+      attributes: ['prod_img', 'prod_name', 'prod_price', 'prod_likes', 'prod_text']
     });
 
     //실패할 경우(전송받은 데이터가 비어있을 경우)
