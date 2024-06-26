@@ -13,12 +13,12 @@ module.exports = class AdminSetup{
                     user_pw: hashedPassword,
                     role: 'admin',
                 });
-                console.log("Admin account created");
+                console.log('관리자 계정으로 로그인하였습니다.');
             }else {
-                console.log('Admin account already exists');
+                console.log('관리자 계정이 이미 존재합니다.');
             }
         }catch (error){
-            console.error("Error creating admin account: ", error);
+            console.error("관리자 계정 생성에 오류가 생겼습니다: ", error);
         }
     }
 }
