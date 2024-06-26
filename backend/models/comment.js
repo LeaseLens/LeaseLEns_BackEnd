@@ -4,7 +4,7 @@ const { Model } = DataTypes;
 module.exports = class Comment extends Model{
   static init(sequelize){
     return super.init({
-      com_index : {
+      com_idx : {
         type: DataTypes.INTEGER,
         autoIncrement:true,
         allowNull : false,
@@ -29,7 +29,7 @@ module.exports = class Comment extends Model{
     });
   }
   static associate(db){
-    db.Comment.belongsTo(db.User,{foreignKey:'user_index'});
-    db.Comment.belongsTo(db.Review,{foreignKey:'rev_index'});
+    db.Comment.belongsTo(db.User,{foreignKey:'user_idx'});
+    db.Comment.belongsTo(db.Review,{foreignKey:'rev_idx'});
   }
 }

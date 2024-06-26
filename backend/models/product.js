@@ -4,7 +4,7 @@ const { Model } = DataTypes;
 module.exports = class Product extends Model{
   static init(sequelize){
     return super.init({
-      prod_index : {
+      prod_idx : {
         type: DataTypes.INTEGER,
         autoIncrement:true,
         allowNull : false,
@@ -44,7 +44,7 @@ module.exports = class Product extends Model{
     });
   }
   static associate(db){
-    db.Product.hasMany(db.Review, { foreignKey : 'prod_index' });
-    db.Product.belongsToMany(db.User, {through:'favorites' , foreignKey : 'prod_index' });
+    db.Product.hasMany(db.Review, { foreignKey : 'prod_idx' });
+    db.Product.belongsToMany(db.User, {through:'favorites' , foreignKey : 'prod_idx' });
   }
 }
