@@ -1,4 +1,4 @@
-const {Product,Review, User} = require('../models');
+const {Product,Review, User, Favorite} = require('../models');
 
 //제품 페이지 조회 및 검색
 exports.main = async (req,res, next) => {
@@ -56,6 +56,20 @@ exports.details = async (req,res, next) =>{
       });
     }
 
+    //현재 제품을 찜했는지 알려주는 isLiked를 true,false 값으로 알려준다.
+    let isLiked = false;
+    if(req.isAuthenticated()) {
+      const user_idx = req.session.passport.user;
+      const favorite = await Favorite.findOne({
+        where: { user_idx , prod_idx: productId }
+      });
+      if(favorite){
+        isLiked = true;
+      }
+    }
+    //비로그인 상태인 경우 항상 false이다.
+
+
     // 제품에 대한 리뷰를 조회합니다.
     const reviews = await Review.findAll({
       where: {
@@ -71,7 +85,8 @@ exports.details = async (req,res, next) =>{
       message: '성공적으로 제품 상세 데이터를 전송하였습니다.',
       data: {
         productDetail: productDetail, // 검색된 상세 정보를 productDetail의 키로 넣어줍니다.
-        reviews : reviews
+        reviews : reviews,
+        isLiked : isLiked
       }
     });
 
