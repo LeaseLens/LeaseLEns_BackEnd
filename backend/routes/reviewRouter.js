@@ -10,6 +10,9 @@ router.get('/',controller.main);
 //review 작성하기(제출)
 router.post('/',isLoggedIn, controller.writeReview);
 
+//image 경로 handler
+router.post('/img', isLoggedIn, controller.uploadImages); 
+
 //review 글 삭제하기
 router.delete('/:rev_idx', isLoggedIn, controller.deleteReview);
 

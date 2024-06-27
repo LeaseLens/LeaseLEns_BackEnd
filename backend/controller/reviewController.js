@@ -30,6 +30,19 @@ const upload = multer({
   storage: localStorage,
   limits: { fileSize: 10 * 1024 * 1024 }
 }).fields([{ name: 'rev_img', maxCount: 3 }, { name: 'rev_authImg', maxCount: 3 }]);
+
+exports.uploadImages = (req, res) => {
+  upload(req, res, (err) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    const imageUrls = req.files.map(file => `http://localhost:8080/uploads/reviews/${file.filename}`);
+    console.log(imageUrls, file.filename);
+    res.json({ urls: imageUrls });
+  });
+};
+
+
 exports.main = async (req, res, next) => {
   try {
     const title = req.query.title || 'all';
@@ -154,8 +167,6 @@ exports.writeReview = (req, res, next) => {
     }
   });
 };
-
-
 exports.deleteReview = async (req, res, next) => {
  
   try {
