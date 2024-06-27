@@ -7,7 +7,7 @@ exports.main = async(req,res,next) => {
   try{
     // review 테이블에서 필요한 데이터 가져오기
     const reviews = await Review.findAll({
-      attributes: ['rev_img', 'rev_text', 'rev_title', 'rev_rating']
+      attributes: ['rev_img', 'rev_text', 'rev_title', 'rev_rating','prod_idx']
     });
 
     // product 테이블에서 필요한 데이터 가져오기
