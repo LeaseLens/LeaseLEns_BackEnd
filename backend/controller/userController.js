@@ -87,8 +87,8 @@ exports.logout = (req, res, next) => {
 //회원탈퇴
 exports.quit = async (req, res, next) => {
   try {
-    const userId = req.user.user_index;
-    await User.destroy({ where: { user_index: userId } });
+    const userId = req.user.user_idx;
+    await User.destroy({ where: { user_idx: userId } });
     req.logout(function (err) {
       if (err) {
         return next(err);

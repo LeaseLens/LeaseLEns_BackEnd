@@ -79,6 +79,13 @@ exports.writeReview = (req, res, next) => {
 
     try {
       const user_idx = req.session.passport.user;
+      if(!user_idx){
+        return res.status(403).json({
+          code: 403,
+          message: '리뷰 작성 권한이 없습니다. 로그인해주세요!',
+          data: {}
+        });
+      }
       const { rev_title, prod_idx, rev_text, rev_rating } = req.body;
       console.log(rev_title, rev_text, prod_idx, rev_rating);
       // 필수 데이터 검사
