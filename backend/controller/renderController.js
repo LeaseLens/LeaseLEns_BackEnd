@@ -77,8 +77,19 @@ exports.mypage = async(req,res,next) =>{
     // user_idx에 해당하는 Review 테이블의 rev_title, rev_name, rev_createdAt
     const userReviews = await Review.findAll({
       where: { user_idx },
-      attributes: ['rev_title', 'rev_createdAt']
-    });    
+      attributes: ['rev_idx', 'rev_createdAt', 'rev_title', 'rev_isAuth'],
+      include: [
+        {
+          model:User,
+          attributes:['user_ID'],
+          required : true
+        },
+        {
+          model: Product,
+          attributes: ['prod_name'],
+        }
+      ]  
+    })    
     // 응답 데이터 구성
     res.json({
       code: 200,
