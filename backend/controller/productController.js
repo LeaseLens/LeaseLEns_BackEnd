@@ -1,4 +1,4 @@
-const {Product,Review, User, Favorite} = require('../models');
+const {Product, Review, User, Favorite} = require('../models');
 
 //제품 페이지 조회 및 검색
 exports.main = async (req,res, next) => {
@@ -122,7 +122,10 @@ exports.like = async(req,res,next)=>{
 
     if (isLiked) {
       // 이미 찜한 제품이라면 찜 해제 (Favorites 테이블에서 삭제)
+      // products 테이블의 prod_likes -1
       await user.removeProduct(product);
+      await product.decrement('prod_likes'); // prod_likes 값을 1 감소시킴
+
       return res.json({
         code: 200,
         message: '제품 찜을 해제했습니다.',
@@ -130,7 +133,9 @@ exports.like = async(req,res,next)=>{
       });
     } else {
       // 찜하지 않은 제품이라면 찜 추가 (Favorites 테이블에 추가)
+      // products 테이블의 prod_likes +1
       await user.addProduct(product);
+      await product.increment('prod_likes'); // prod_likes 값을 1 증가시킴
       return res.json({
         code: 200,
         message: '제품을 찜했습니다.',
