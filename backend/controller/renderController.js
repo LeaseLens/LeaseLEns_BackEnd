@@ -28,6 +28,31 @@ exports.main = async(req,res,next) => {
     next(err);
   }
 }
+
+exports.authCheck = async(req,res,next)=>{
+  try{
+    if(req.isAuthenticated()){
+      return res.status(200).json({
+        code:200,
+        message:"로그인된 사용자입니다.",
+        data:{
+          isAuthenticated:true
+        }
+      })
+    }else{
+      return res.status(200).json({
+        code:200,
+        message:"비로그인 사용자입니다.",
+        data:{
+          isAuthenticated:false
+        }
+      })
+    };
+  }catch(err){
+    next(err);
+  }
+}
+
 //마이 페이지 렌더링
 exports.mypage = async(req,res,next) =>{
   try{
