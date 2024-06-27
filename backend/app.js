@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const passport= require('passport')
 const cors = require('cors');
+const bodyParser= require('body-parser')
+const path = require('path');
 
 const db =require('./models');
 const error404 = require('./Middlewares/error404');
@@ -61,6 +63,13 @@ app.use(session({
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// 기본 body-parser 설정
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// 정적 파일 경로 설정 (업로드된 파일 접근 가능하게)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/users', userRouter);
 app.use('/reviews',reviewRouter);
