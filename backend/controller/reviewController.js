@@ -227,7 +227,7 @@ exports.reviewDetails = async (req,res,next) =>{
         },
         {
           model: Comment,
-          attributes: ['com_text', 'createdAt'],
+          attributes: ['com_idx', 'com_text', 'createdAt'],
           include: [
             {
               model: User,
