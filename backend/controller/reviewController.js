@@ -257,6 +257,11 @@ exports.reviewDetails = async (req, res, next) => {
               required: true
             }
           ]
+        },
+        {
+          model: User, // Review를 작성한 사용자의 user_ID 가져오기
+          attributes: ['user_ID'],
+          required: true
         }
       ]
     });

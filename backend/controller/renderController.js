@@ -7,7 +7,7 @@ exports.main = async(req,res,next) => {
   try{
     // review 테이블에서 필요한 데이터 가져오기
     const reviews = await Review.findAll({
-      attributes: ['rev_img', 'rev_text', 'rev_title', 'rev_rating']
+      attributes: ['rev_img', 'rev_text', 'rev_title', 'rev_rating','prod_idx']
     });
 
     // product 테이블에서 필요한 데이터 가져오기
@@ -28,6 +28,31 @@ exports.main = async(req,res,next) => {
     next(err);
   }
 }
+
+exports.authCheck = async(req,res,next)=>{
+  try{
+    if(req.isAuthenticated()){
+      return res.status(200).json({
+        code:200,
+        message:"로그인된 사용자입니다.",
+        data:{
+          isAuthenticated:true
+        }
+      })
+    }else{
+      return res.status(200).json({
+        code:200,
+        message:"비로그인 사용자입니다.",
+        data:{
+          isAuthenticated:false
+        }
+      })
+    };
+  }catch(err){
+    next(err);
+  }
+}
+
 //마이 페이지 렌더링
 exports.mypage = async(req,res,next) =>{
   try{
@@ -52,8 +77,19 @@ exports.mypage = async(req,res,next) =>{
     // user_idx에 해당하는 Review 테이블의 rev_title, rev_name, rev_createdAt
     const userReviews = await Review.findAll({
       where: { user_idx },
-      attributes: ['rev_title', 'rev_createdAt']
-    });    
+      attributes: ['rev_idx', 'rev_createdAt', 'rev_title', 'rev_isAuth'],
+      include: [
+        {
+          model:User,
+          attributes:['user_ID'],
+          required : true
+        },
+        {
+          model: Product,
+          attributes: ['prod_name'],
+        }
+      ]  
+    })    
     // 응답 데이터 구성
     res.json({
       code: 200,
