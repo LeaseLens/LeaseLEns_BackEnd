@@ -74,7 +74,6 @@ exports.details = async (req,res, next) =>{
     const reviews = await Review.findAll({
       where: {
         prod_idx: productId,
-        rev_isAuth: true // rev_isAuth가 참인 값만 가져옵니다.
       },
       attributes: ['rev_img', 'rev_rating', 'rev_title', 'rev_text']
     });    
