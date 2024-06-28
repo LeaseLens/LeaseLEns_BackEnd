@@ -1,12 +1,13 @@
 const { Review, User, Product, Comment } = require('../models');
-const aws = require('aws-sdk');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
+const aws = require('aws-sdk');
 
 dotenv.config();
 
+// AWS S3 configuration
 aws.config.update({
   accessKeyId: process.env.AWS_S3_KEY_ID,
   secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
@@ -15,6 +16,7 @@ aws.config.update({
 
 const s3 = new aws.S3();
 
+// 로컬 저장소 설정
 const localStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadPath = path.join(__dirname, '../uploads/reviews');
@@ -28,35 +30,12 @@ const localStorage = multer.diskStorage({
 
 const upload = multer({
   storage: localStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB 파일 사이즈 제한
 }).fields([{ name: 'rev_img', maxCount: 3 }, { name: 'rev_authImg', maxCount: 3 }]);
-
-const uploadToS3 = (file) => {
-  return new Promise((resolve, reject) => {
-    const fileContent = fs.readFileSync(file.path);
-    const params = {
-      Bucket: process.env.AWS_S3_BUCKET,
-      Key: `reviews/${Date.now()}_${path.basename(file.originalname)}`,
-      Body: fileContent,
-      ACL: 'public-read',
-    };
-    console.log(`Uploading ${file.path} to S3`);
-    s3.upload(params, (err, data) => {
-      if (err) {
-        console.error(`Error uploading ${file.path}:`, err);
-        reject(err);
-      } else {
-        console.log(`Uploaded ${file.path} to ${data.Location}`);
-        resolve(data.Location);
-      }
-    });
-  });
-};
-
 
 // 이미지 업로드 핸들러 (최대 3개의 이미지 파일)
 exports.uploadImages = (req, res) => {
-  upload(req, res, async (err) => {
+  upload(req, res, (err) => {
     if (err) {
       console.error('Error during file upload:', err);
       return res.status(500).json({ error: err.message });
@@ -64,26 +43,50 @@ exports.uploadImages = (req, res) => {
     try {
       const files = req.files['rev_img'] || [];
       console.log('Received files:', files);
-      const imageUrls = await Promise.all(files.map(file => uploadToS3(file)));
-      console.log('Image URLs:', imageUrls);
-      
-      files.forEach(file => {
-        console.log(`Deleting local file ${file.path}`);
-        fs.unlinkSync(file.path)
-      }); // S3에 업로드 후 로컬 파일 삭제
 
-      console.log(imageUrls)
-      res.json({ urls: imageUrls[0]});
+      // 로컬 파일 경로 반환
+      const imageUrls = files.map(file => `http://localhost:8080/uploads/reviews/${file.filename}`);
+      console.log('Image URLs:', imageUrls);
+
+      res.json({ urls: imageUrls[0] });
     } catch (error) {
       console.error('Error uploading images:', error);
       res.status(500).json({ error: error.message });
     }
   });
 };
+// Function to upload files to S3
+const uploadToS3 = (file) => {
+  return new Promise((resolve, reject) => {
+    const fileStream = fs.createReadStream(file.path);
+
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: `reviews/${Date.now()}-${path.basename(file.path)}`,
+      Body: fileStream,
+      ContentType: file.mimetype,
+      ACL: 'public-read',
+    };
+
+    s3.upload(params, (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(data.Location);
+    });
+  });
+};
+
+
 // 리뷰 작성
 exports.writeReview = (req, res, next) => {
   // 필수 필드 검증
+  upload(req, res, async function (err) {
+    if (err) {
+      return next(err); // 업로드 오류 처리
+    }
   const { rev_title, prod_idx, rev_text, rev_rating } = req.body;
+  console.log(req.body);
   if (!rev_title || !prod_idx || !rev_text || !rev_rating) {
     return res.status(400).json({
       code: 400,
@@ -91,12 +94,6 @@ exports.writeReview = (req, res, next) => {
       data: {}
     });
   }
-  
-  upload(req, res, async function (err) {
-    if (err) {
-      return next(err); // 업로드 오류 처리
-    }
-    
     try {
       const user_idx = req.session.passport.user;
       if (!user_idx) {
