@@ -69,7 +69,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // 정적 파일 경로 설정 (업로드된 파일 접근 가능하게)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads/reviews', express.static(path.join(__dirname, 'uploads/reviews')));
 
 app.use('/users', userRouter);
 app.use('/reviews',reviewRouter);
