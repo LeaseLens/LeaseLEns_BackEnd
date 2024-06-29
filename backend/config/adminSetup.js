@@ -9,11 +9,11 @@ module.exports = class AdminSetup{
                 const hashedPassword = await bcrypt.hash('adminpassword', 10);
                 await User.create({
                     user_ID:'admin',
-                    user_name: 'Administrator',
+                    user_name: 'Admin',
                     user_pw: hashedPassword,
                     role: 'admin',
                 });
-                console.log('관리자 계정으로 로그인하였습니다.');
+                console.log('관리자 계정이 생성되었습니다.');
             }else {
                 console.log('관리자 계정이 이미 존재합니다.');
             }
