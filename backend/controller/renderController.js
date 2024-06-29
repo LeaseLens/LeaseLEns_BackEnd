@@ -57,7 +57,7 @@ exports.adminCheck = async (req, res, next) =>{
     if(req.isAuthenticated() && req.user.role === 'admin'){
       return res.status(200).json({
         code: 200,
-        message:'관리자입니다',
+        message:'',
         data:{
           isAdmin:true
         }
@@ -65,7 +65,7 @@ exports.adminCheck = async (req, res, next) =>{
     }else {
       return res.status(200).json({
         code:200,
-        message:'관리자 아닙니다',
+        message:'',
         data:{
           isAdmin:false,
         }
