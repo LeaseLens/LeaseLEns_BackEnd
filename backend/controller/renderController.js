@@ -52,6 +52,29 @@ exports.authCheck = async(req,res,next)=>{
     next(err);
   }
 }
+exports.adminCheck = async (req, res, next) =>{
+  try{
+    if(req.isAuthenticated() && req.user.role === 'admin'){
+      return res.status(200).json({
+        code: 200,
+        message:'관리자입니다',
+        data:{
+          isAdmin:true
+        }
+      })
+    }else {
+      return res.status(200).json({
+        code:200,
+        message:'관리자 아닙니다',
+        data:{
+          isAdmin:false,
+        }
+      })
+    };
+  }catch(err){
+    next(err);
+  }
+}
 
 //마이 페이지 렌더링
 exports.mypage = async(req,res,next) =>{
