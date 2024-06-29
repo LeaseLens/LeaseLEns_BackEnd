@@ -75,7 +75,7 @@ exports.details = async (req,res, next) =>{
       where: {
         prod_idx: productId,
       },
-      attributes: ['rev_img', 'rev_rating', 'rev_title', 'rev_text']
+      attributes: ['rev_idx','rev_img', 'rev_rating', 'rev_title', 'rev_text']
     });    
 
     //성공 시
