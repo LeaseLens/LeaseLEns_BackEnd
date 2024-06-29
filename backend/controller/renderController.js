@@ -32,11 +32,13 @@ exports.main = async(req,res,next) => {
 exports.authCheck = async(req,res,next)=>{
   try{
     if(req.isAuthenticated()){
+      user_idx = req.session.passport.user;
       return res.status(200).json({
         code:200,
         message:"로그인된 사용자입니다.",
         data:{
-          isAuthenticated:true
+          isAuthenticated:true,
+          currentUserId: user_idx
         }
       })
     }else{
