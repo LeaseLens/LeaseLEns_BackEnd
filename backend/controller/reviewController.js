@@ -272,6 +272,11 @@ exports.reviewDetails = async (req, res, next) => {
               required: true
             }
           ]
+        },
+        {
+          model: User, // Review를 작성한 사용자의 user_ID 가져오기
+          attributes: ['user_ID'],
+          required: true
         }
       ]
     });
@@ -377,7 +382,7 @@ exports.deleteComments = async (req, res, next) => {
     const rev_idx = req.params.rev_idx;
     const com_idx = req.params.com_idx;
 
-    const comment = await Comment.findOne({ where: { com_idx, rev_idx, user_idx } });
+    const comment = await Comment.findOne({ where: { com_idx, rev_idx} });
     if (!comment) {
       return res.status(404).json({
         code: 404,
@@ -386,7 +391,21 @@ exports.deleteComments = async (req, res, next) => {
       });
     }
 
-    await comment.destroy();
+    if (comment.user_idx !== user_idx) {
+      return res.status(403).json({
+        code: 403,
+        message: '댓글을 삭제할 권한이 없습니다.',
+        data: {}
+      });
+    }
+
+    await Comment.destroy({
+      where: {
+        com_idx,
+        rev_idx,
+        user_idx
+      }
+    });
 
     res.json({
       code: 200,
