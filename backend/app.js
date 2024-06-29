@@ -83,11 +83,10 @@ app.use(error404);
 //기타 에러처리 미들웨어
 app.use(handleError);
 
-
-  app.listen(PORT,()=>{
-    console.log(`${PORT}번 포트에서 서버 실행중 . . . `);
-  if(process.env.CREATE_ADMIN === 'true'){
-    const adminSetup = new AdminSetup();
-    adminSetup.createAdmin();                 //Create admin account on server start
-  }
-  });
+app.listen(PORT,()=>{
+  console.log(`${PORT}번 포트에서 서버 실행중 . . . `);
+if(process.env.CREATE_ADMIN === 'true'){
+  const adminSetup = new AdminSetup();
+  adminSetup.createAdmin();                 //Create admin account on server start
+}
+});
