@@ -35,7 +35,7 @@ db.sequelize
 passportConfig(); //passport config 초기화
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.FRONT_ADDRESS||'http://localhost:3000',
   credentials: true,
 }));
 
