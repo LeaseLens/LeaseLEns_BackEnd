@@ -24,11 +24,11 @@ module.exports = class Review extends Model{
         allowNull:false,
       },
       rev_img:{
-        type: DataTypes.STRING(255), // BLOB에서 STRING으로 변경
+        type: DataTypes.TEXT,
         allowNull:true,
       },
       rev_authImg:{
-        type: DataTypes.STRING(255), // BLOB에서 STRING으로 변경
+        type: DataTypes.TEXT,
         allowNull:false,
       },
       rev_title:{
