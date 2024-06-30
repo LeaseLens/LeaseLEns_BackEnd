@@ -7,7 +7,7 @@ const user = require('./user');
 const dotenv = require('dotenv');
 
 dotenv.config();
-const env = process.env.NODE_ENV || 'yerim';
+const env = process.env.NODE_ENV;
 const config = require('../config/config')[env];
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
 

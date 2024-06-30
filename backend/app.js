@@ -20,7 +20,8 @@ const PORT = 8080;
 
 dotenv.config();
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV;
+console.log(env);
 const config = require('./config/config')[env];
 
 const app = express();
@@ -35,7 +36,7 @@ db.sequelize
 passportConfig(); //passport config 초기화
 
 app.use(cors({
-  origin: env==='production'? process.env.FRONT_ADDRESS : 'http://localhost:3000',
+  origin: process.env.FRONT_ADDRESS,
   credentials: true,
 }));
 
