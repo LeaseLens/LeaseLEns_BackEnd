@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const { User } = require("../models");
+const { User, Review, Comment, Favorite } = require("../models");
 
 //회원가입
 exports.register = async (req, res, next) => {
@@ -86,9 +86,18 @@ exports.logout = (req, res, next) => {
 
 //회원탈퇴
 exports.quit = async (req, res, next) => {
+  const userId = req.user.user_idx;
+  const transaction = await User.sequelize.transaction();
+
   try {
-    const userId = req.user.user_idx;
-    await User.destroy({ where: { user_idx: userId } });
+    await Review.destroy({where:{user_idx : userId}, transaction});
+    await Comment.destroy({where:{user_idx : userId}, transaction});
+    await Favorite.destroy({where:{user_idx : userId}, transaction});
+
+    await User.destroy({ where: { user_idx: userId }, transaction });
+
+    await transaction.commit();
+
     req.logout(function (err) {
       if (err) {
         return next(err);
@@ -106,6 +115,7 @@ exports.quit = async (req, res, next) => {
       });
     });
   } catch (err) {
+    await transaction.rollback();
     next(err);
   }
 };
