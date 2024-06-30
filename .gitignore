@@ -6,5 +6,8 @@ node_modules/
 .env.development
 .env.production
 
+# 파일 정보
+uploads/
+
 #보안
 package-lock.json
