@@ -84,46 +84,42 @@ const uploadToS3 = (file) => {
 
 // 리뷰 작성
 exports.writeReview = (req, res, next) => {
-  // 필수 필드 검증
   upload(req, res, async function (err) {
     if (err) {
       return next(err); // 업로드 오류 처리
     }
-  const { rev_title, prod_idx, rev_text, rev_rating} = req.body;
-  const rev_authImg_files = req.files['rev_authImg'] || [];
-  if (!rev_title || !prod_idx || !rev_text || !rev_rating || !rev_authImg_files) {
-    return res.status(400).json({
-      code: 400,
-      message: '필수 필드를 모두 입력해 주세요.',
-      data: {}
-    });
-  }
+    const { rev_title, prod_idx, rev_text, rev_rating } = req.body;
+    const rev_authImg_files = req.files['rev_authImg'] || [];
+    console.log(req.body);
+    if (!rev_title || !prod_idx || !rev_text || !rev_rating || rev_authImg_files.length === 0) {
+      // 필수 필드가 누락된 경우 로컬 파일 삭제
+      const filesToDelete = [...(req.files['rev_img'] || []), ...rev_authImg_files];
+      filesToDelete.forEach(file => fs.unlinkSync(file.path));
+      return res.status(400).json({
+        code: 400,
+        message: '필수 필드를 모두 입력해 주세요.',
+        data: {}
+      });
+    }
     try {
       const user_idx = req.session.passport.user;
       if (!user_idx) {
         // 로그인하지 않은 경우 로컬 파일 삭제
-        const filesToDelete = [...(req.files['rev_img'] || []), ...(req.files['rev_authImg'] || [])];
+        const filesToDelete = [...(req.files['rev_img'] || []), ...rev_authImg_files];
         filesToDelete.forEach(file => fs.unlinkSync(file.path));
-        
         return res.status(403).json({
           code: 403,
           message: '리뷰 작성 권한이 없습니다. 로그인해주세요!',
           data: {}
         });
       }
-
       const rev_img_files = req.files['rev_img'] || [];
-      const rev_authImg_files = req.files['rev_authImg'] || [];
-
       const rev_img_urls = await Promise.all(rev_img_files.map(file => uploadToS3(file)));
       const rev_authImg_urls = await Promise.all(rev_authImg_files.map(file => uploadToS3(file)));
-
       // S3에 업로드한 후 로컬 파일 삭제
       [...rev_img_files, ...rev_authImg_files].forEach(file => fs.unlinkSync(file.path));
-      
       const rev_img = rev_img_urls.join(',');
       const rev_authImg = rev_authImg_urls.join(',');
-      
       const newReview = await Review.create({
         rev_title,
         user_idx,
@@ -135,7 +131,6 @@ exports.writeReview = (req, res, next) => {
         rev_authImg,
         rev_rating
       });
-      
       res.json({
         code: 200,
         message: '리뷰가 성공적으로 작성되었습니다.',
