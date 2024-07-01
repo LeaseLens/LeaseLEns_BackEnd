@@ -5,6 +5,10 @@ const fs = require('fs');
 const dotenv = require('dotenv');
 const aws = require('aws-sdk');
 
+const envFile = `.env.${process.env.NODE_ENV}`;
+if (fs.existsSync(envFile)) {
+  dotenv.config({ path: envFile });
+}
 dotenv.config();
 
 // AWS S3 configuration
@@ -45,7 +49,7 @@ exports.uploadImages = (req, res) => {
       console.log('Received files:', files);
 
       // 로컬 파일 경로 반환
-      const imageUrls = files.map(file => `http://localhost:8080/uploads/reviews/${file.filename}`);
+      const imageUrls = files.map(file => `http://3.35.20.170:8080/uploads/reviews/${file.filename}`);
       console.log('Image URLs:', imageUrls);
 
       res.json({ urls: imageUrls[0] });
@@ -85,9 +89,9 @@ exports.writeReview = (req, res, next) => {
     if (err) {
       return next(err); // 업로드 오류 처리
     }
-  const { rev_title, prod_idx, rev_text, rev_rating } = req.body;
+  const { rev_title, prod_idx, rev_text, rev_rating, rev_authImg } = req.body;
   console.log(req.body);
-  if (!rev_title || !prod_idx || !rev_text || !rev_rating) {
+  if (!rev_title || !prod_idx || !rev_text || !rev_rating || !rev_authImg) {
     return res.status(400).json({
       code: 400,
       message: '필수 필드를 모두 입력해 주세요.',
