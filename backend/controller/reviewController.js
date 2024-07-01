@@ -89,9 +89,9 @@ exports.writeReview = (req, res, next) => {
     if (err) {
       return next(err); // 업로드 오류 처리
     }
-  const { rev_title, prod_idx, rev_text, rev_rating, rev_authImg } = req.body;
-  console.log(req.body);
-  if (!rev_title || !prod_idx || !rev_text || !rev_rating || !rev_authImg) {
+  const { rev_title, prod_idx, rev_text, rev_rating} = req.body;
+  const rev_authImg_files = req.files['rev_authImg'] || [];
+  if (!rev_title || !prod_idx || !rev_text || !rev_rating || !rev_authImg_files) {
     return res.status(400).json({
       code: 400,
       message: '필수 필드를 모두 입력해 주세요.',
