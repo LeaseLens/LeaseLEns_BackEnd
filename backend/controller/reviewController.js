@@ -255,7 +255,7 @@ exports.reviewDetails = async (req, res, next) => {
 
     const review = await Review.findOne({
       where: { rev_idx },
-      attributes: ['rev_isAuth', 'rev_text', 'rev_img', 'rev_title', 'rev_rating'],
+      attributes: ['rev_idx','rev_isAuth', 'rev_text', 'rev_img', 'rev_title', 'rev_rating'],
       include: [
         {
           model: Product,
