@@ -7,7 +7,6 @@ if (fs.existsSync(envFile)) {
 }//.env.${NODE_ENV} 존재할 시 연결해주기
 dotenv.config(); // 기본 .env 파일 로드
 
-
 module.exports = {
   development:{
     username:process.env.DB_USER,
