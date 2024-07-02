@@ -24,7 +24,7 @@ module.exports = class Review extends Model{
         allowNull:false,
       },
       rev_img:{
-        type: DataTypes.TEXT,
+        type: DataTypes.TEXT('long'),
         allowNull:true,
       },
       rev_authImg:{
