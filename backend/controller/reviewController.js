@@ -152,7 +152,7 @@ exports.main = async (req, res, next) => {
     const condition = title === 'all' ? {} : { rev_title: title };
 
     const reviews = await Review.findAll({
-      order:[[rev_createdAt, desc]],
+      order:[['rev_createdAt', 'desc']],
       where: condition,
       attributes: ['rev_idx', 'rev_createdAt', 'rev_title', 'rev_isAuth'],
       include: [
