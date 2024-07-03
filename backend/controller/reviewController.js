@@ -49,7 +49,7 @@ exports.uploadImages = (req, res) => {
       console.log('Received files:', files);
 
       // 로컬 파일 경로 반환
-      const imageUrls = files.map(file => `${process.env.FRONT_ADDRESS}/uploads/reviews/${file.filename}`);
+      const imageUrls = files.map(file => `${process.env.CURRENT_ADDRESS}/uploads/reviews/${file.filename}`);
       console.log('Image URLs:', imageUrls);
 
       res.json({ urls: imageUrls[0] });
