@@ -59,7 +59,7 @@ exports.uploadImages = (req, res) => {
     }
   });
 };
-// Function to upload files to S3
+// S3에 이미지 업로드 
 const uploadToS3 = (file) => {
   return new Promise((resolve, reject) => {
     const fileStream = fs.createReadStream(file.path);
@@ -118,6 +118,7 @@ exports.writeReview = (req, res, next) => {
       const rev_authImg_urls = await Promise.all(rev_authImg_files.map(file => uploadToS3(file)));
       // S3에 업로드한 후 로컬 파일 삭제
       [...rev_img_files, ...rev_authImg_files].forEach(file => fs.unlinkSync(file.path));
+      
       const rev_img = rev_img_urls.join(',');
       const rev_authImg = rev_authImg_urls.join(',');
       const newReview = await Review.create({
